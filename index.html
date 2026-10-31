@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CŌNE</title>
+<meta name="description" content="Application de chantier de CŌNES Colors">
+<meta name="theme-color" content="#B4F500">
+<meta name="apple-mobile-web-app-title" content="CŌNE">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<style>
+/* Page de lancement : affiche le logo une fraction de seconde puis ouvre l'app sur claude.ai */
+:root{--bg:#f4f6ef;--fg:#142000;--muted:#5d6852;--btn:#142000;--btn-fg:#e8ff7a}
+@media (prefers-color-scheme:dark){:root{--bg:#10140b;--fg:#eef5e2;--muted:#a9b59a;--btn:#e8ff7a;--btn-fg:#142000}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:16px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;padding:24px 16px}
+main{text-align:center;max-width:360px}
+img{width:96px;height:96px;border-radius:22px}
+h1{margin:16px 0 4px;font-size:22px}
+p{margin:0 0 20px;color:var(--muted)}
+a{display:inline-block;background:var(--btn);color:var(--btn-fg);text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px}
+</style>
+</head>
+<body>
+<main>
+  <img src="icons/icon-192.png" alt="Logo CŌNE">
+  <h1>CŌNE</h1>
+  <p>Ouverture de l'app…</p>
+  <a id="go" href="https://claude.ai/artifact/1GK98cL2HfGQcAuW3hBpbe">Ouvrir l'app CŌNE</a>
+</main>
+<script>
+// L'app et ses données vivent sur claude.ai : on y va directement.
+location.replace(document.getElementById("go").href);
+</script>
+</body>
+</html>
