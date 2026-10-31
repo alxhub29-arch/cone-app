@@ -27,12 +27,15 @@ a{display:inline-block;background:var(--btn);color:var(--btn-fg);text-decoration
 <main>
   <img src="icons/icon-192.png" alt="Logo CŌNE">
   <h1>CŌNE</h1>
-  <p>Ouverture de l'app…</p>
+  <p id="msg">Ouverture de l'app…</p>
   <a id="go" href="https://claude.ai/artifact/1GK98cL2HfGQcAuW3hBpbe">Ouvrir l'app CŌNE</a>
 </main>
 <script>
-// L'app et ses données vivent sur claude.ai : on y va directement.
-location.replace(document.getElementById("go").href);
+// L'app et ses données vivent sur claude.ai. À la première visite, on laisse le temps
+// d'ajouter cette page à l'écran d'accueil ; ensuite, l'icône ouvre directement l'app.
+let vu=false;try{vu=localStorage.getItem("cone-vu")==="1";localStorage.setItem("cone-vu","1")}catch(e){}
+if(vu)location.replace(document.getElementById("go").href);
+else document.getElementById("msg").textContent="Pour installer : touchez Partager, puis « Sur l'écran d'accueil ». Ensuite, l'icône CŌ ouvrira directement l'app.";
 </script>
 </body>
 </html>
