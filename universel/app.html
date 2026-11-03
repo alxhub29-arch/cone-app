@@ -1,0 +1,1153 @@
+<title>PaysaPro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* App mobile d'abord : en-tête aux couleurs de l'entreprise (réglables), une colonne (max 720px), onglets en bas */
+:root{
+  /* --yellow, --lime, --green = les 3 couleurs de l'entreprise (réécrites au démarrage depuis Réglages) */
+  --yellow:#4d7c0f; --lime:#15803d; --green:#065f46; --hd-fg:#ffffff; --hd-sh:0 1px 2px rgba(0,0,0,.25);
+  --bg:color-mix(in srgb,var(--green) 5%,#f6f7f3); --surface:#ffffff; --fg:#191d15; --muted:#5b6156; --line:color-mix(in srgb,var(--green) 14%,#e1e3dc); --chip:color-mix(in srgb,var(--green) 9%,#eff1eb);
+  --ink:color-mix(in srgb,var(--green) 30%,#0b0e09); --ink-fg:#ffffff;
+  --ok:#0c7a2a; --ok-bg:#dcf5e1; --warn:#8a4a0c; --warn-bg:#fbe8d4; --bad:#8d1f1f; --bad-bg:#f8dcdc; --info-bg:color-mix(in srgb,var(--green) 11%,#eef0ea);
+  --font:"Helvetica Neue",Helvetica,Arial,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:color-mix(in srgb,var(--green) 6%,#0e100c); --surface:color-mix(in srgb,var(--green) 8%,#181b15); --fg:#eef1ea; --muted:#a6ab9f; --line:color-mix(in srgb,var(--green) 15%,#2a2e26); --chip:color-mix(in srgb,var(--green) 12%,#22261e);
+  --ink:color-mix(in srgb,var(--lime) 45%,#f4f6f1); --ink-fg:#10130d; --ok:#6fe08a; --ok-bg:#16351e; --warn:#f3b46e; --warn-bg:#3a2a14; --bad:#f39a9a; --bad-bg:#3d1c1c; --info-bg:color-mix(in srgb,var(--green) 14%,#23271f); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:color-mix(in srgb,var(--green) 6%,#0e100c); --surface:color-mix(in srgb,var(--green) 8%,#181b15); --fg:#eef1ea; --muted:#a6ab9f; --line:color-mix(in srgb,var(--green) 15%,#2a2e26); --chip:color-mix(in srgb,var(--green) 12%,#22261e);
+  --ink:color-mix(in srgb,var(--lime) 45%,#f4f6f1); --ink-fg:#10130d; --ok:#6fe08a; --ok-bg:#16351e; --warn:#f3b46e; --warn-bg:#3a2a14; --bad:#f39a9a; --bad-bg:#3d1c1c; --info-bg:color-mix(in srgb,var(--green) 14%,#23271f); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 var(--font);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--yellow)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(90deg,var(--yellow) 0%,var(--lime) 48%,var(--green) 100%);color:var(--hd-fg);text-shadow:var(--hd-sh);
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hd{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.icon{flex:none;width:40px;height:40px;border-radius:11px;overflow:hidden;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);background:linear-gradient(135deg,var(--yellow),var(--lime) 48%,var(--green));box-shadow:0 0 0 2px rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;letter-spacing:-1px}
+.icon img{width:100%;height:100%;object-fit:cover;display:block;background:#fff}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.03em;line-height:1.05;min-width:0;overflow:hidden}
+.logo span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo small{display:block;font-size:9px;letter-spacing:2.5px;margin-top:3px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .gear{margin-left:auto;flex:none;background:rgba(255,255,255,.28);border:0;border-radius:10px;color:inherit;font:600 13px var(--font);padding:9px 12px;cursor:pointer;text-shadow:inherit}
+main{max-width:720px;margin:0 auto;padding-block:16px 110px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 8px;font-weight:600}
+h3{font-size:15px;margin:0;font-weight:600}
+p{margin:0 0 8px}
+.muted{color:var(--muted)} .small{font-size:12.5px;color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+button.card{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.row>*{min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{display:block;font-size:20px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pill{font-size:11px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap;background:var(--info-bg);color:var(--fg)}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-warn{background:var(--warn-bg);color:var(--warn)} .p-bad{background:var(--bad-bg);color:var(--bad)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:12px;padding:12px 16px;font:600 14px var(--font);background:var(--ink);color:var(--ink-fg);cursor:pointer;min-height:44px}
+a.btn{text-decoration:none} .btn.alt{background:var(--chip);color:var(--fg)} .btn.danger{background:var(--bad-bg);color:var(--bad)} .btn.full{width:100%}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.photo{position:relative;border-radius:10px;overflow:hidden;background:var(--chip);aspect-ratio:1}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .tag{position:absolute;left:4px;bottom:4px;background:rgba(20,32,0,.75);color:#fff;font:600 11px var(--font);border-radius:6px;padding:2px 6px}
+.photo .x{position:absolute;right:4px;top:4px;background:rgba(20,32,0,.75);color:#fff;border:0}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:99px;padding:7px 12px;font:500 13px var(--font);cursor:pointer;min-height:36px}
+.chip.on{background:var(--ink);color:var(--ink-fg);border-color:var(--ink)}
+label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;font:15px var(--font);color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 11px;min-height:44px}
+textarea{min-height:70px;resize:vertical}
+.btn:focus-visible,.chip:focus-visible,button.card:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.line{display:grid;grid-template-columns:minmax(0,1fr) 74px 84px 36px;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.line input{min-height:38px;padding:6px 8px;font-size:14px}
+.line .x{background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer;min-height:38px}
+.tot{display:grid;grid-template-columns:1fr auto;gap:3px 12px;margin-top:10px}
+.tot .big{font-weight:700;font-size:18px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);
+  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+.tabs .in{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{border:0;background:none;font:500 11px var(--font);color:var(--muted);padding:6px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:48px}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.tab[aria-current="page"]{color:var(--fg)} .tab[aria-current="page"] svg{stroke:var(--green)}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);background:var(--ink);color:var(--ink-fg);border-radius:12px;padding:10px 14px;font-size:13.5px;opacity:0;transition:.2s;pointer-events:none;max-width:calc(100% - 32px);z-index:20}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.empty{text-align:center;padding:28px 12px;color:var(--muted)}
+.copybox{width:100%;min-height:160px;font:13px/1.5 var(--mono)}
+.todo{display:flex;gap:10px;align-items:flex-start}
+.todo .pill{flex:none}
+a.link{color:var(--fg);font-weight:600}
+.check{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit;text-align:left;min-height:44px}
+.check .box{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:14px}
+.check.done .box{background:var(--ink);border-color:var(--ink);color:var(--ink-fg)}
+.check.done span:last-child{text-decoration:line-through;color:var(--muted)}
+.opt{font-size:11px;display:flex;gap:4px;align-items:center;color:var(--muted);margin-top:2px}
+.opt input{width:auto;min-height:0}
+.back{background:none;border:0;color:var(--muted);font:500 14px var(--font);padding:4px 0;margin-bottom:6px;cursor:pointer}
+.swatch{width:100%;height:28px;border-radius:8px;background:linear-gradient(90deg,var(--a),var(--b) 48%,var(--c))}
+.preset{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:6px;cursor:pointer;font:500 12px var(--font);color:var(--fg);display:flex;flex-direction:column;gap:4px;min-height:44px}
+.preset.on{border-color:var(--ink)}
+.presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+input[type=color]{padding:2px;height:44px}
+.welcome{display:grid;gap:10px;margin-top:14px}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+
+<header><div class="hd">
+  <div class="icon" id="hdIcon" role="img" aria-label="Logo">P</div>
+  <div class="logo" id="hdLogo"><span>PaysaPro</span><small>Mon app de chantier</small></div>
+  <button class="gear" id="gear" type="button">Réglages</button>
+</div></header>
+<main id="main"><div class="empty">Chargement de vos données…</div></main>
+<nav class="tabs" aria-label="Sections"><div class="in" id="tabs"></div></nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+const TABS=[
+  {k:"accueil",t:"Accueil",i:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>'},
+  {k:"clients",t:"Clients",i:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .7 3.2 2.4 3.6 5.2"/>'},
+  {k:"chantiers",t:"Chantiers",i:'<path d="M3 20h18M5 20V10l7-5 7 5v10"/><path d="M10 20v-5h4v5"/>'},
+  {k:"devis",t:"Devis",i:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>'},
+  {k:"decomptes",t:"Sous-trait.",i:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3M8 17h6"/>'}];
+const TYPES={particulier:"Particulier",entreprise:"Entreprise","sous-traitance":"Donneur d'ordre (sous-traitance)",public:"Pouvoir public"};
+const MACHINES_DEF=[
+{c:"Véhicules et transport",l:["Camionnette","Remorque","Galerie de toit","Brouette","Diable","Sangles d'arrimage","Filet de remorque"]},
+{c:"Tonte et pelouse",l:["Tondeuse thermique","Tondeuse à batterie","Tracteur tondeuse","Débroussailleuse","Coupe-bordures","Scarificateur","Aérateur","Rouleau à gazon","Épandeur","Semoir"]},
+{c:"Taille et élagage",l:["Taille-haie à batterie","Taille-haie thermique","Taille-haie sur perche","Élagueuse sur perche","Tronçonneuse","Tronçonneuse d'élagage","Sécateur","Sécateur électrique","Cisaille","Ébrancheur","Scie d'élagage","Harnais","Cordes","Casque forestier","Pantalon anti-coupure"]},
+{c:"Déchets verts",l:["Souffleur","Aspirateur-souffleur","Broyeur","Rogneuse de souches","Bâches","Big bags","Sacs à déchets verts","Râteaux","Fourche","Pelle","Bêche"]},
+{c:"Sol et terrassement",l:["Motobineuse","Motoculteur","Mini-pelle","Plaque vibrante","Dameuse","Tarière","Pioche","Niveau laser","Cordeau"]},
+{c:"Nettoyage",l:["Nettoyeur haute pression","Nettoyeur de terrasse rotatif","Brosse rotative","Lance rallonge","Lance gouttière","Pulvérisateur","Anti-mousse","Aspirateur eau et poussière","Tuyau d'arrosage"]},
+{c:"Bois et ponçage",l:["Ponceuse orbitale","Ponceuse à bande","Ponceuse delta","Abrasifs","Huile bois","Vernis","Lasure","Pinceaux plats"]},
+{c:"Peinture",l:["Rouleaux","Pinceaux","Bacs à peinture","Perche télescopique","Ruban de masquage","Bâches de protection","Film plastique","Pistolet à peinture","Grattoirs","Enduit","Couteaux à enduire"]},
+{c:"Outillage électrique",l:["Meuleuse","Perceuse-visseuse","Visseuse à chocs","Perforateur","Scie circulaire","Scie sauteuse","Scie sabre","Scie à onglet","Décapeur thermique","Rallonge électrique","Groupe électrogène"]},
+{c:"Accès en hauteur",l:["Échelle","Escabeau","Échafaudage","Tréteaux","Ligne de vie"]},
+{c:"Sécurité",l:["Gants","Lunettes","Protection auditive","Masque FFP2","Chaussures de sécurité","Gilet fluo","Cônes de signalisation","Trousse de secours"]}];
+const machinesObj=()=>Object.fromEntries((S.cfg.machinesL||MACHINES_DEF).filter(x=>x.c&&(x.l||[]).length).map(x=>[x.c,x.l]));
+let kitAll=false;
+const DSTAT=["brouillon","envoyé","accepté","refusé","facturé"];
+const CSTAT=["prévu","en cours","terminé","décompte envoyé","payé"];
+const FINI=["terminé","décompte envoyé","payé"];
+const JOBS_DEF=[
+  {n:"Jardin",steps:["Photo avant","Désherbage","Tonte","Taille","Ramassage","Photo après"]},
+  {n:"Haies",steps:["Photo avant","Bâches au sol","Taille face et dessus","Ramassage","Charger la remorque","Photo après","Ticket de pesée"]},
+  {n:"Élagage",steps:["Photo avant","Périmètre de sécurité","Élagage","Débitage","Broyage ou chargement","Photo après","Ticket de pesée"]},
+  {n:"Terrasse",steps:["Photo avant","Protéger plantes et façade","Nettoyage haute pression","Laisser sécher 48 h","Huilage 1re couche","Huilage 2e couche","Photo après"]},
+  {n:"Toiture",steps:["Photo avant","Sécuriser l'échelle et le harnais","Démoussage","Nettoyage gouttières","Anti-mousse pulvérisé","Photo après"]},
+  {n:"Plantation",steps:["Photo avant","Préparer le sol","Planter","Arroser","Paillage","Photo après"]},
+  {n:"Peinture",steps:["Photo avant","Protection sols et meubles","Préparation, rebouchage","1re couche","2e couche","Nettoyage","Photo après"]}];
+const jobsList=()=>(S.cfg.jobs||JOBS_DEF).map(j=>j.n).filter(Boolean);
+const stepsFor=t=>(((S.cfg.jobs||JOBS_DEF).find(j=>j.n===t)||{}).steps||[]);
+const FRAIS=["Carburant camionnette","Essence machines","Carburant","Décharge","Matériaux","Location","Outillage","Autre"];
+const MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const PAYS={BE:{n:"Belgique",tvas:[21,6,0],ind:"32"},FR:{n:"France",tvas:[20,10,5.5,0],ind:"33"},LU:{n:"Luxembourg",tvas:[17,8,3,0],ind:"352"}};
+const PRESETS=[["Vert jardin",["#4d7c0f","#15803d","#065f46"]],["Citron vert",["#FFE600","#B4F500","#12D94A"]],["Bleu ciel",["#0ea5e9","#0369a1","#1e3a8a"]],["Terre",["#d97706","#b45309","#78350f"]],["Ardoise",["#475569","#334155","#0f172a"]],["Bordeaux",["#be123c","#9f1239","#4c0519"]]];
+const DEFAULT_CFG={setup:false,role:"patron",entreprise:"",slogan:"",prenom:"",tel:"",email:"",tvaNum:"",iban:"",avisLien:"",logo:"",couleurs:PRESETS[0][1],pays:"BE",tvas:[21,6,0],indicatif:"32",sousTraitance:false,notesFrais:false,outil:"",
+  taux:45,kmCost:0.35,marge:0.15,payeJour:0,tauxOuvrier:0,ouvriers:[],coutCamion:15,carbCamion:12,coutRemorque:5,essMachines:6,depot:"",conditions:"Paiement à 15 jours.",
+  fraisStd:[{n:"Frais de déplacement",p:35},{n:"Évacuation déchets verts (voyage)",p:110}],
+  catalogue:[{n:"Tonte de pelouse",u:"m²",p:0.25},{n:"Taille de haie",u:"m²",p:4},{n:"Élagage d'arbre",u:"arbre",p:180},{n:"Désherbage",u:"heure",p:45},{n:"Plantation",u:"plante",p:8},{n:"Nettoyage de terrasse haute pression",u:"m²",p:6},{n:"Huilage de terrasse bois",u:"m²",p:12},{n:"Démoussage de toiture",u:"m²",p:9},{n:"Peinture murs",u:"m²",p:15}],
+  decharges:[],kits:{}};
+const ent=()=>S.cfg.entreprise||"Mon entreprise";
+const tvas=()=>(S.cfg.tvas&&S.cfg.tvas.length?S.cfg.tvas:[21,6,0]);
+const outil=()=>S.cfg.outil||"la facture";
+const signLines=()=>[S.cfg.prenom,S.cfg.entreprise,S.cfg.tel].filter(Boolean);
+const slug=s=>(s||"app").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"")||"app";
+
+const S={cfg:DEFAULT_CFG,clients:[],chantiers:[],devis:[],decomptes:[],contrats:[]};
+let route={tab:"accueil",id:null,sub:null};
+let draft=null; // objet en cours d'édition (non enregistré)
+let store=null, online=false;
+
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eur=n=>(Number(n)||0).toLocaleString("fr-BE",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";
+const num=v=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:0};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const ymd=x=>x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
+const today=()=>ymd(new Date());
+const month=()=>today().slice(0,7);
+const addDays=(d,n)=>{const x=new Date(d+"T12:00:00");x.setDate(x.getDate()+n);return ymd(x)};
+const hfmt=n=>String(+(+n||0).toFixed(2)).replace(".",",");
+const daysSince=d=>d?Math.floor((Date.now()-new Date(d+"T12:00:00"))/864e5):0;
+const fraisDefaut=()=>(S.cfg.fraisStd||[]).filter(f=>f.n).map(f=>({n:f.n,q:1,p:num(f.p)}));
+const prixVoyage=()=>num(((S.cfg.fraisStd||[]).find(f=>/évacuation|déchet/i.test(f.n))||{}).p);
+const mapsUrl=a=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a);
+const FAUSSE_ADR=/^\s*(l'|la\s+)?(m[eê]me\s+)?(adresse(\s+(du|de\s+la|client|du\s+client))*|idem|id\.?|pareil|client|chez\s+le\s+client)\s*\.?\s*$/i;
+const adrReelle=(a,cid)=>{a=(a||"").trim();return a&&!FAUSSE_ADR.test(a)?a:(client(cid)?.adresse||"").trim()};
+const upMap=el=>{const m=document.getElementById("m_"+el.id);if(!m)return;const v=el.id==="h_adr"&&draft?adrReelle(el.value,draft.clientId):el.value.trim();m.href=mapsUrl(v);m.style.display=v?"inline-block":"none"};
+const mapLink=(id,a)=>`<a class="link maplink" id="m_${id}" href="${esc(mapsUrl(a||""))}" target="_blank" rel="noopener" style="display:${a?"inline-block":"none"};margin-top:6px">📍 Ouvrir dans Google Maps ›</a>`;
+const fdate=d=>d?new Date(d+"T12:00:00").toLocaleDateString("fr-BE",{day:"numeric",month:"short",year:"numeric"}):"";
+const client=id=>S.clients.find(c=>c.id===id);
+const cname=id=>client(id)?.nom||"Client inconnu";
+let tt;function toast(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2600)}
+
+/* ---------- stockage : uniquement sur cet appareil (IndexedDB, sinon localStorage) ---------- */
+const COLS=["clients","chantiers","devis","decomptes","contrats"];
+const LS="paysapro-data";
+let IDB=null,mem={};const PH={};
+function idbOpen(){return new Promise(res=>{try{const r=indexedDB.open("paysapro",1);r.onupgradeneeded=()=>{r.result.createObjectStore("kv");r.result.createObjectStore("photos")};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null)}catch(e){res(null)}})}
+function idbReq(st,mode,f){return new Promise((res,rej)=>{const t=IDB.transaction(st,mode);const r=f(t.objectStore(st));t.oncomplete=()=>res(r&&r.result);t.onerror=t.onabort=()=>rej(t.error||new Error("stockage"))})}
+async function loadAll(){
+  if(IDB){const k=await idbReq("kv","readonly",s=>s.getAllKeys()),v=await idbReq("kv","readonly",s=>s.getAll());k.forEach((x,i)=>mem[x]=v[i]);
+    const pk=await idbReq("photos","readonly",s=>s.getAllKeys()),pv=await idbReq("photos","readonly",s=>s.getAll());pk.forEach((x,i)=>PH[x]=pv[i])}
+  else{try{mem=JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){mem={}}Object.assign(PH,mem._photos||{});delete mem._photos}
+}
+async function persist(key){
+  if(IDB){if(mem[key]===undefined)await idbReq("kv","readwrite",s=>s.delete(key));else await idbReq("kv","readwrite",s=>s.put(mem[key],key));return}
+  try{localStorage.setItem(LS,JSON.stringify({...mem,_photos:PH}))}catch(e){throw{code:"quota_exceeded"}}
+}
+async function savePhoto(data){const pid="ph"+uid();PH[pid]=data;if(IDB)await idbReq("photos","readwrite",s=>s.put(data,pid));else await persist("_");return pid}
+async function delPhoto(pid){delete PH[pid];try{if(IDB)await idbReq("photos","readwrite",s=>s.delete(pid));else await persist("_")}catch(e){}}
+const phSrc=p=>p.pid?(PH[p.pid]||""):(p.data||"");
+function localStore(){
+  return{
+    start(){COLS.forEach(c=>S[c]=Object.entries(mem[c]||{}).map(([id,v])=>({...v,id})));Object.entries(EQ).forEach(([k,c])=>S[k]=Object.entries(mem[c]||{}).map(([id,v])=>({...v,id})));S.cfg={...DEFAULT_CFG,...(mem.config||{})};applyBrand(S.cfg);render()},
+    async save(col,id,data){mem[col]={...(mem[col]||{}),[id]:data};await persist(col);this.start()},
+    async remove(col,id){if(mem[col]){delete mem[col][id];await persist(col)}this.start()},
+    async saveCfg(c){mem.config=c;await persist("config");this.start()}};
+}
+async function boot(){
+  IDB=await idbOpen();
+  try{await loadAll()}catch(e){console.warn("lecture",e)}
+  online=!!IDB;store=localStore();
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  S.cfg={...DEFAULT_CFG,...(mem.config||{})};
+  if(!S.cfg.setup)route={tab:"bienvenue",id:null,sub:null};
+  else if(S.cfg.role==="ouvrier")setOuvrier();
+  store.start();
+  await handleHash();
+  window.addEventListener("hashchange",handleHash);
+}
+/* ---------- couleurs et logo de l'entreprise ---------- */
+function lum(h){h=String(h||"#000").replace("#","");if(h.length===3)h=h.split("").map(x=>x+x).join("");const c=[0,2,4].map(i=>parseInt(h.substr(i,2),16)/255).map(v=>v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4));return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+const initiales=n=>(n||"P").split(/[\s\-']+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+function applyBrand(c){
+  const cols=(c.couleurs&&c.couleurs.length===3)?c.couleurs:DEFAULT_CFG.couleurs;const R=document.documentElement.style;
+  R.setProperty("--yellow",cols[0]);R.setProperty("--lime",cols[1]);R.setProperty("--green",cols[2]);
+  const clair=(lum(cols[0])+lum(cols[1]))/2>0.42;R.setProperty("--hd-fg",clair?"#141a0e":"#ffffff");R.setProperty("--hd-sh",clair?"none":"0 1px 2px rgba(0,0,0,.25)");
+  const name=c.entreprise||"PaysaPro";
+  const ic=document.getElementById("hdIcon");if(ic){ic.innerHTML=c.logo?`<img src="${esc(c.logo)}" alt="">`:esc(initiales(name));ic.setAttribute("aria-label","Logo "+name)}
+  const lg=document.getElementById("hdLogo");if(lg)lg.innerHTML=`<span>${esc(name)}</span><small>${esc(c.slogan||(c.entreprise?"":"Mon app de chantier"))}</small>`;
+  document.title=name;
+  let tc=document.querySelector('meta[name="theme-color"]');if(!tc){tc=document.createElement("meta");tc.name="theme-color";document.head.appendChild(tc)}tc.content=cols[1];
+  if(c.logo){let ap=document.querySelector('link[rel="apple-touch-icon"]');if(!ap){ap=document.createElement("link");ap.rel="apple-touch-icon";document.head.appendChild(ap)}ap.href=c.logo}
+}
+/* ---------- liens WhatsApp : chantier vers l'ouvrier, rapport vers le patron ---------- */
+const APP_URL=/^https?:/.test(location.protocol)&&!/claude|claudeusercontent/.test(location.host)?location.href.split("#")[0]:"https://alxhub29-arch.github.io/cone-app/pro/";
+const enc64=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const dec64=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/")))));
+const brandMini=()=>({e:S.cfg.entreprise,s:S.cfg.slogan,c:S.cfg.couleurs,t:S.cfg.tel,p:S.cfg.prenom});
+async function handleHash(){
+  const h=location.hash||"";const mm=/[#&]m=([\w-]+)/.exec(h),mr=/[#&]r=([\w-]+)/.exec(h);
+  if(!mm&&!mr)return;
+  try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  await importCode(mm?"m":"r",(mm||mr)[1]);
+}
+async function importCode(kind,code){
+  let o;try{o=dec64(code)}catch(e){toast("Ce lien est abîmé : demandez-le à nouveau.");return false}
+  if(kind==="m"){
+    if(S.cfg.setup&&S.cfg.role!=="ouvrier"){toast("Ce lien est un chantier pour l'app d'un ouvrier.");return false}
+    const b=o.b||{};const cfg={...S.cfg,setup:true,role:"ouvrier",entreprise:b.e||S.cfg.entreprise,slogan:b.s||"",couleurs:b.c||S.cfg.couleurs,patronTel:b.t||"",patronNom:b.p||""};
+    await store.saveCfg(cfg);setOuvrier();const{id,b:_b,v,...m}=o;await save(EQ.missions,{id,...m},"Chantier ajouté : "+(m.titre||""));go("missions");return true}
+  if(S.cfg.role==="ouvrier"){toast("Ce lien est un rapport pour l'app du patron.");return false}
+  if(!S.cfg.setup){toast("Créez d'abord votre app, puis rouvrez ce lien.");return false}
+  const{v,...r}=o;r.statut=S.rapports.find(x=>x.id===r.id)?.statut||"nouveau";
+  if(await save(EQ.rapports,r,"Rapport de "+(r.auteurNom||"l'ouvrier")+" reçu."))go("rapports",r.id);return true;
+}
+function codeFromText(t){const m=/[#&]([mr])=([\w-]{8,})/.exec(t||"");return m?{kind:m[1],code:m[2]}:null}
+function shareBox(text,tel,label){const enc=encodeURIComponent(text);return`<div class="card" style="border:2px solid var(--green)"><b>${esc(label||"Message prêt")}</b>
+  <div class="btns"><a class="btn" href="https://wa.me/${esc(tel?telIntl(tel):"")}?text=${enc}" target="_blank" rel="noopener">Envoyer par WhatsApp</a><a class="btn alt" href="sms:${esc(tel||"")}?&body=${enc}">SMS</a><button class="btn alt" type="button" data-act="copyTxt">Copier</button></div>
+  <textarea class="copybox" readonly aria-label="Message" style="margin-top:10px">${esc(text)}</textarea></div>`}
+let apercu=false;
+function apercuBar(){return apercu&&role==="ouvrier"?`<div class="card" style="background:var(--chip);border:2px dashed var(--green)"><b>👀 Aperçu : ce que voient vos ouvriers</b><div class="small">Aucun prix ni décompte. Seuls les chantiers « prévu » ou « en cours » apparaissent.</div><div class="btns"><button class="btn" type="button" data-w="retour">‹ Revenir à ma vue patron</button></div></div>`:""}
+function setOuvrier(){if(role==="ouvrier")return;role="ouvrier";route={tab:"missions",id:null,sub:null};draft=null}
+async function ensureNewClient(){
+  const nc=draft&&draft._nc;if(!nc)return true;
+  if(!nc.nom.trim()){toast("Indiquez le nom du nouveau client.");return false}
+  const c={id:uid(),nom:nc.nom.trim(),type:nc.type||"particulier",adresse:nc.adresse||"",tel:nc.tel||"",email:nc.email||"",tvaNum:"",tva:nc.type==="sous-traitance"?0:tvas()[0],note:""};
+  if(!await save("clients",c))return false;
+  draft.clientId=c.id;if(route.tab==="chantiers"&&!draft.adresse&&c.adresse)draft.adresse=c.adresse;delete draft._nc;return true;
+}
+async function save(col,obj,msg){
+  const {id,_nc,...data}=obj;
+  try{await store.save(col,id,data);if(msg)toast(msg);return true}
+  catch(e){const m=e&&e.code==="quota_exceeded"?"Base pleine : supprimez d'anciens éléments.":"Pas enregistré ("+(e&&(e.code||e.message)||"erreur")+"). Réessayez ; si cela continue, faites une sauvegarde dans Réglages.";toast(m);console.error("save",col,e);return false}
+}
+
+/* ---------- calculs ---------- */
+function evacCost(ev){
+  if(!ev||!ev.on)return 0;
+  const site=S.cfg.decharges.find(d=>d.id===ev.site)||{t:0,f:0};
+  const dump=Math.max(num(ev.t)*num(site.t),num(site.min))+num(site.f);
+  return (dump+num(ev.km)*S.cfg.kmCost+num(ev.h)*S.cfg.taux)*(1+S.cfg.marge);
+}
+function devisTotals(d){
+  const lignes=(d.lignes||[]).filter(l=>!l.opt).reduce((s,l)=>s+num(l.q)*num(l.p),0);const options=(d.lignes||[]).filter(l=>l.opt).reduce((s,l)=>s+num(l.q)*num(l.p),0);
+  const ev=evacCost(d.evac);const ht=lignes+ev;const tva=ht*num(d.tva)/100;
+  return{lignes,options,ev,ht,tva,ttc:ht+tva,acompte:(ht+tva)*num(d.acompte)/100,eh:num(d.heuresEst)?lignes/num(d.heuresEst):0};
+}
+function tauxFor(o){if(!o)return S.cfg.taux;const ch=o.chantierId&&S.chantiers.find(x=>x.id===o.chantierId);return num(o.taux)||(ch&&num(ch.taux))||num(client(o.clientId)?.taux)||S.cfg.taux}
+function tauxPill(o){const t=tauxFor(o);return t!==S.cfg.taux?` <span class="pill">${t} €/h</span>`:""}
+function isRegie(c){return c.mode?c.mode!=="devis":!S.devis.some(d=>d.chantierId===c.id&&["accepté","facturé"].includes(d.statut))}
+function regieTotals(c){
+  const hh=(c.heures||[]).reduce((s,h)=>s+num(h.hommes)*num(h.h),0);const taux=tauxFor(c);const mo=hh*taux;
+  const coef=1+num(S.cfg.margeAchats)/100;
+  const achatsL=(c.frais||[]).filter(f=>f.refact).map(f=>({n:(f.lib||f.cat),ht:num(f.montant)/(1+tvas()[0]/100)*coef}));
+  const achats=achatsL.reduce((s,x)=>s+x.ht,0);
+  const autres=(c.lignes||[]).reduce((s,l)=>s+num(l.q)*num(l.p),0);
+  const ht=mo+achats+autres;const tx=num(client(c.clientId)?.tva??tvas()[0]);const tva=ht*tx/100;
+  return{hh,taux,mo,achatsL,achats,autres,ht,tx,tva,ttc:ht+tva};
+}
+function regieText(c,greet){
+  const t=regieTotals(c);const cl=client(c.clientId)||{};const L=[];
+  if(greet){L.push(cl.type==="particulier"?`Bonjour ${(cl.nom||"").split(" ")[0]},`:"Bonjour,","",`Voici le décompte des travaux « ${c.titre||c.type} »${adrReelle(c.adresse,c.clientId)?" ("+adrReelle(c.adresse,c.clientId)+")":""} :`)}
+  else L.push(`Décompte en régie : ${c.titre||c.type}`,`Client : ${cname(c.clientId)}`);
+  if(c.travaux)L.push("",`Travaux effectués : ${c.travaux}`);
+  L.push("","Main-d'œuvre :");
+  [...(c.heures||[])].sort((a,b)=>(a.d||"").localeCompare(b.d||"")).forEach(h=>{const n=num(h.hommes)||1;const nf=x=>String(+x.toFixed(2)).replace(".",",");L.push(`- ${fdate(h.d)} : ${n>1?n+" hommes × ":""}${nf(num(h.h))} h${n>1?" = "+nf(n*num(h.h))+" h":""}`)});
+  L.push(`Total ${String(+t.hh.toFixed(2)).replace(".",",")} h × ${eur(t.taux)} = ${eur(t.mo)} HTVA`);
+  if(t.achatsL.length){L.push("","Achats et fournitures :");t.achatsL.forEach(x=>L.push(`- ${x.n} : ${eur(x.ht)} HTVA`))}
+  if((c.lignes||[]).length){L.push("","Autres :");c.lignes.forEach(l=>L.push(`- ${l.n} : ${num(l.q)!==1?num(l.q)+" × "+eur(l.p)+" = ":""}${eur(num(l.q)*num(l.p))} HTVA`))}
+  L.push("",`Total HTVA : ${eur(t.ht)}`,`TVA ${t.tx} % : ${eur(t.tva)}`,`Total TVAC : ${eur(t.ttc)}`);
+  if(t.tx===0)L.push("Autoliquidation : TVA due par le cocontractant.");
+  if(S.cfg.conditions)L.push("",S.cfg.conditions);
+  if(greet)L.push("","Merci pour votre confiance !","",...signLines());
+  return L.join("\n");
+}
+function decTotals(dc){
+  let hh=0,old=0;(dc.jours||[]).forEach(j=>{hh+=num(j.hommes)*num(j.h);old+=num(j.hommes)*num(j.h)/8*num(dc.payeJour??S.cfg.payeJour)});
+  const taux=tauxFor(dc);const montant=hh*taux;return{hh,taux,montant,old,gap:montant-old};
+}
+const CC=k=>num(S.cfg[k]??DEFAULT_CFG[k]);
+const ouvrier=id=>(S.cfg.ouvriers||[]).find(o=>o.id===id);
+function benefice(c){
+  const H=c.heures||[];const jours=new Set(H.filter(h=>num(h.h)>0).map(h=>h.d)).size;
+  const hh=H.reduce((s,h)=>s+num(h.hommes)*num(h.h),0);
+  const moiH=H.reduce((s,h)=>s+(num(h.hommes)>0?num(h.h):0),0);
+  let ouvH=0,ouvPaye=0,sansTaux=false;H.forEach(h=>{const x=Math.max(0,num(h.hommes)-1)*num(h.h);if(!x)return;const o=ouvrier(h.ouv);const r=o?num(o.taux):CC("tauxOuvrier");if(!r)sansTaux=true;ouvH+=x;ouvPaye+=x*r});
+  const isR=isRegie(c);const recette=isR?regieTotals(c).ht:S.devis.filter(d=>d.chantierId===c.id&&["accepté","facturé"].includes(d.statut)).reduce((s,d)=>s+devisTotals(d).ht,0);
+  const ouvFact=hh?(isR?ouvH*tauxFor(c):recette*ouvH/hh):0;
+  const F=c.frais||[];const sumCat=re=>F.filter(f=>re.test(f.cat||"")).reduce((s,f)=>s+num(f.montant),0);
+  const tCarb=sumCat(/^carburant/i),tEss=sumCat(/^essence machines/i);
+  const autresFrais=F.filter(f=>!/^(carburant|essence machines)/i.test(f.cat||"")).reduce((s,f)=>s+num(f.montant),0);
+  const remorque=(c.kit||[]).some(k=>/remorque/i.test(k));
+  const L=[["Ouvriers payés ("+hfmt(ouvH)+" h)",ouvPaye],["Carburant camionnette"+(tCarb?" (tickets)":" (estimé)"),tCarb||jours*CC("carbCamion")],["Camionnette : assurance, entretien, usure",jours*CC("coutCamion")],["Remorque",remorque?jours*CC("coutRemorque"):0],["Essence machines"+(tEss?" (tickets)":" (estimé)"),tEss||jours*CC("essMachines")],["Autres achats et frais (tickets)",autresFrais]];
+  const couts=L.reduce((s,x)=>s+x[1],0);const net=recette-couts;
+  return{jours,hh,moiH,ouvH,ouvPaye,ouvFact,ouvGain:ouvFact-ouvPaye,sansTaux,recette,L,couts,net,parH:moiH?net/moiH:0};
+}
+function cardBenef(c){const b=benefice(c);if(!b.hh&&!b.recette)return"";
+  return`<h2>Ce que je gagne sur ce chantier</h2><div class="card"><div class="tot">
+  <span>Facturé HTVA</span><span class="num">${eur(b.recette)}</span>
+  ${b.L.filter(x=>x[1]).map(([n,v])=>`<span>− ${esc(n)}</span><span class="num">${eur(v)}</span>`).join("")}
+  <span class="big">Mon bénéfice</span><span class="num big" style="color:${b.net<0?"var(--bad)":"inherit"}">${eur(b.net)}</span></div>
+  <p class="small" style="margin-top:6px">${b.jours} jour(s) sur place · mes heures : ${hfmt(b.moiH)} h${b.moiH?` · soit <b class="num">${eur(b.parH)}</b> par heure pour moi`:""}</p>
+  ${b.ouvH?`<div class="tot" style="margin-top:8px"><span>Heures des ouvriers facturées</span><span class="num">${eur(b.ouvFact)}</span><span>Payé aux ouvriers</span><span class="num">${eur(b.ouvPaye)}</span><span class="big">Bénéfice sur les ouvriers</span><span class="num big">${eur(b.ouvGain)}</span></div>`:""}
+  ${b.sansTaux?`<p class="small" style="color:var(--bad);margin-top:6px">Indiquez le taux horaire de vos ouvriers dans Réglages pour un calcul juste.</p>`:""}
+  <p class="small" style="margin-top:6px">Frais estimés par jour (modifiables dans Réglages). Un ticket « Carburant camionnette » ou « Essence machines » remplace l'estimation.</p></div>`}
+function chantierStats(c){
+  const hh=(c.heures||[]).reduce((s,h)=>s+num(h.hommes)*num(h.h),0);
+  const frais=(c.frais||[]).reduce((s,f)=>s+num(f.montant),0);
+  const dv=S.devis.filter(d=>d.chantierId===c.id&&["accepté","facturé"].includes(d.statut));
+  const ht=isRegie(c)?regieTotals(c).ht:dv.reduce((s,d)=>s+devisTotals(d).ht,0);
+  return{hh,frais,ht,eh:hh?(ht-frais)/hh:0};
+}
+function nextPassage(k,from){
+  let d=addDays(from,7*Math.max(1,num(k.freqSem)||2));
+  for(let i=0;i<60;i++){const m=new Date(d+"T12:00:00").getMonth()+1;const a=num(k.moisDebut)||1,b=num(k.moisFin)||12;if(a<=b?(m>=a&&m<=b):(m>=a||m<=b))return d;d=addDays(d,7)}
+  return d;
+}
+function passagesSaison(k){const a=num(k.moisDebut)||1,b=num(k.moisFin)||12;const mois=a<=b?b-a+1:12-a+b+1;return Math.round(mois*4.33/Math.max(1,num(k.freqSem)||2))}
+function nextNumero(){
+  const y=new Date().getFullYear();const n=S.devis.reduce((m,d)=>{const r=/^D-(\d{4})-(\d+)$/.exec(d.numero||"");return r&&+r[1]===y?Math.max(m,+r[2]):m},0)+1;
+  return"D-"+y+"-"+String(n).padStart(3,"0");
+}
+
+/* ---------- navigation ---------- */
+function go(tab,id=null,sub=null){route={tab,id,sub};draft=null;for(const k in openSec)delete openSec[k];render();window.scrollTo(0,0)}
+function renderTabs(){
+  const cur=route.tab==="contrats"?"chantiers":route.tab;const tabsP=TABS.filter(t=>t.k!=="decomptes"||S.cfg.sousTraitance);const nav=document.querySelector(".tabs");if(nav)nav.hidden=route.tab==="bienvenue";const g=document.getElementById("gear");if(g)g.hidden=role==="ouvrier"||route.tab==="bienvenue";
+  const list=role==="ouvrier"?TABS_O:tabsP;document.getElementById("tabs").style.gridTemplateColumns="repeat("+list.length+",1fr)";document.getElementById("tabs").innerHTML=list.map(t=>`<button class="tab" type="button" data-tab="${t.k}" ${cur===t.k?'aria-current="page"':""}><svg viewBox="0 0 24 24" aria-hidden="true">${t.i}</svg>${t.t}</button>`).join("");
+}
+document.getElementById("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(b)go(b.dataset.tab)});
+document.getElementById("gear").addEventListener("click",()=>go("reglages"));
+
+function render(){
+  renderTabs();
+  const m=document.getElementById("main");
+  const banner=online?"":`<div class="banner">Ce navigateur garde peu de place pour les données. Faites souvent une sauvegarde (Réglages, Mes données).</div>`;
+  const v=VIEWS[route.tab]||vAccueil;
+  // ne pas réécrire un formulaire en cours d'édition quand une mise à jour arrive d'ailleurs
+  if(draft&&m.dataset.form===route.tab+":"+(route.id||"")&&document.activeElement&&m.contains(document.activeElement))return;
+  m.innerHTML=banner+apercuBar()+v();
+  m.dataset.form=draft?route.tab+":"+(route.id||""):"";
+}
+
+const VIEWS={get bienvenue(){return vBienvenue},get accueil(){return vAccueil},get clients(){return vClients},get chantiers(){return vChantiers},get devis(){return vDevis},get decomptes(){return vDecomptes},get reglages(){return vReglages},get contrats(){return vContrats},get missions(){return vMissions},get rapport(){return vRapport},get mesrapports(){return vMesRapports},get rapports(){return vRapports}};
+/* ---------- Bienvenue (premier lancement) ---------- */
+function vBienvenue(){
+  if(route.sub==="ouvrier")return `<button class="back" type="button" data-act="bienvenueRetour">‹ Retour</button><h1>Version ouvrier</h1>
+  <p class="muted">Votre patron vous envoie chaque chantier par WhatsApp. Vous voyez l'adresse, le matériel et les consignes, puis vous lui renvoyez votre rapport : heures, travail fait, déchets, difficultés.</p>
+  <label for="w_nom">Votre prénom</label><input id="w_nom" autocomplete="given-name" value="${esc(monNom())}">
+  <div class="btns"><button class="btn full" type="button" data-act="finOuvrier">C'est parti</button></div>`;
+  return `<h1>Bienvenue</h1>
+  <p class="muted">L'app de chantier pour paysagistes et jardiniers : clients, chantiers, devis, décomptes à l'heure, photos avant/après, bénéfice par chantier et rapports de vos ouvriers. Vous la mettez à votre nom, avec votre logo et vos couleurs.</p>
+  <div class="welcome">
+    <div class="card"><h3>Je suis le patron</h3><p class="small">Je crée l'app de mon entreprise : nom, logo, couleurs, tarifs.</p><div class="btns"><button class="btn" type="button" data-act="setupPatron">Créer mon app</button></div></div>
+    <div class="card"><h3>Je suis ouvrier</h3><p class="small">Mon patron m'envoie mes chantiers par WhatsApp.</p><div class="btns"><button class="btn alt" type="button" data-act="setupOuvrier">Version ouvrier</button></div></div>
+    <div class="card"><h3>J'ai une sauvegarde</h3><p class="small">Je change de téléphone et je récupère mes données.</p>${restoreUI()}</div>
+  </div>
+  <p class="small" style="margin-top:16px">Vos données restent sur cet appareil. Rien n'est envoyé sur internet, sauf les messages que vous choisissez d'envoyer.</p>`;
+}
+function restoreUI(){return confirmRestore?`<div class="banner" style="margin-top:8px">Sauvegarde du ${fdate((confirmRestore.date||"").slice(0,10))} : elle remplacera toutes les données de cet appareil.<div class="btns"><button class="btn" type="button" data-act="doRestore">Restaurer</button><button class="btn alt" type="button" data-act="cancelRestore">Annuler</button></div></div>`
+  :`<div class="btns"><label class="btn alt filebtn">📂 Choisir le fichier<input type="file" accept="application/json,.json" data-restore="" aria-label="Choisir un fichier de sauvegarde"></label></div>`}
+/* ---------- Accueil ---------- */
+function vAccueil(){
+  const mois=month();
+  const attente=S.devis.filter(d=>d.statut==="envoyé");
+  const aFacturer=S.devis.filter(d=>d.statut==="accepté");
+  const sumAF=aFacturer.reduce((s,d)=>s+devisTotals(d).ht,0);
+  const decs=S.decomptes.filter(d=>d.mois===mois);
+  const decSum=decs.reduce((s,d)=>s+decTotals(d).montant,0);
+  const gap=decs.reduce((s,d)=>s+decTotals(d).gap,0);
+  const soon=S.chantiers.filter(c=>!FINI.includes(c.statut)).sort((a,b)=>(a.date||"9").localeCompare(b.date||"9")).slice(0,5);
+  const relances=S.devis.filter(d=>d.statut==="envoyé"&&daysSince(d.sentAt||d.date)>=7);
+  const dus=S.contrats.filter(k=>k.actif!==false&&k.prochain&&k.prochain<=addDays(today(),7));
+  const fraisNS=[];S.chantiers.forEach(c=>(c.frais||[]).forEach(f=>{if(!f.smart)fraisNS.push(f)}));
+  const sansTicket=S.chantiers.filter(c=>FINI.includes(c.statut)&&(c.checklist||[]).some(x=>x.t==="Ticket de pesée"&&!x.done));
+  const y=String(new Date().getFullYear());
+  const caDev=S.devis.filter(d=>["accepté","facturé"].includes(d.statut)&&(d.date||"").startsWith(y)).reduce((s,d)=>s+devisTotals(d).ht,0);
+  const caDec=S.decomptes.filter(d=>(d.mois||"").startsWith(y)).reduce((s,d)=>s+decTotals(d).montant,0);
+  let hhT=0,htT=0,frT=0;S.chantiers.filter(c=>FINI.includes(c.statut)).forEach(c=>{const st=chantierStats(c);if(st.hh){hhT+=st.hh;htT+=st.ht;frT+=st.frais}});
+  const ehReel=hhT?(htT-frT)/hhT:0;
+  const aEnvoyer=S.chantiers.filter(c=>c.statut==="terminé"&&isRegie(c));
+  const impayes=S.chantiers.filter(c=>c.statut==="décompte envoyé"&&!c.decompteST);
+  const sumImp=impayes.reduce((s,c)=>s+regieTotals(c).ttc,0);
+  const caReg=S.chantiers.filter(c=>["décompte envoyé","payé"].includes(c.statut)&&isRegie(c)&&!c.decompteST&&(c.envoyeLe||c.date||"").startsWith(y)).reduce((s,c)=>s+regieTotals(c).ht,0);
+  const todo=[
+    ...aEnvoyer.map(c=>`<button class="card todo" type="button" data-open="chantiers:${c.id}"><span class="pill p-warn">Décompte</span><span><b>${esc(c.titre||c.type)} · ${esc(cname(c.clientId))}</b><br><span class="small">${client(c.clientId)?.type==="sous-traitance"?`Terminé : ajouter les ${hfmt(regieTotals(c).hh)} h au décompte de sous-traitance`:`Terminé : envoyer le décompte (${hfmt(regieTotals(c).hh)} h · ${eur(regieTotals(c).ttc)} TVAC)`}</span></span></button>`),
+    ...impayes.filter(c=>daysSince(c.envoyeLe||c.date)>=15).map(c=>`<button class="card todo" type="button" data-open="chantiers:${c.id}"><span class="pill p-bad">Paiement</span><span><b>${esc(c.titre||c.type)} · ${esc(cname(c.clientId))}</b><br><span class="small">Décompte envoyé il y a ${daysSince(c.envoyeLe||c.date)} jours, pas encore payé · ${eur(regieTotals(c).ttc)}</span></span></button>`),
+    ...relances.map(d=>`<button class="card todo" type="button" data-open="devis:${d.id}"><span class="pill p-warn">Relancer</span><span><b>${esc(d.numero)} · ${esc(cname(d.clientId))}</b><br><span class="small">Envoyé il y a ${daysSince(d.sentAt||d.date)} jours · ${eur(devisTotals(d).ht)} HTVA</span></span></button>`),
+    ...dus.map(k=>`<div class="card todo"><span class="pill">Entretien</span><span style="flex:1"><b>${esc(k.titre)} · ${esc(cname(k.clientId))}</b><br><span class="small">Passage prévu le ${fdate(k.prochain)}</span><div class="btns" style="margin-top:6px"><button class="btn alt" type="button" data-act="passage" data-id="${k.id}">Planifier le passage</button></div></span></div>`),
+    ...(S.cfg.notesFrais&&fraisNS.length?[`<div class="card todo"><span class="pill p-warn">Frais</span><span><b>${fraisNS.length} frais à déclarer en note de frais</b><br><span class="small">${eur(fraisNS.reduce((s,f)=>s+num(f.montant),0))} TVAC${S.cfg.outil?", à encoder chez "+esc(S.cfg.outil):""}</span></span></div>`]:[]),
+    ...sansTicket.map(c=>`<button class="card todo" type="button" data-open="chantiers:${c.id}"><span class="pill">Ticket</span><span><b>${esc(c.titre)}</b><br><span class="small">Noter le poids net du ticket de pesée</span></span></button>`)];
+  const rapN=S.rapports.filter(r=>r.statut!=="ajouté").length;
+  return `<div class="row"><h1>Bonjour${S.cfg.prenom?" "+esc(S.cfg.prenom):""}</h1><button class="btn alt" type="button" data-act="apercu" style="padding:8px 12px">👀 Version ouvriers</button></div>${rapN?`<button class="card" type="button" data-tabgo="rapports" style="border:2px solid var(--green);margin-top:10px"><div class="row"><h3>📋 ${rapN} rapport${rapN>1?"s":""} d'ouvrier à voir</h3><span>›</span></div><div class="small">Heures, travail fait, déchets verts et photos envoyés par l'équipe.</div></button>`:""}<p class="small">${new Date().toLocaleDateString("fr-BE",{weekday:"long",day:"numeric",month:"long"})}</p>
+  <div class="grid2" style="margin-top:12px">
+    <div class="stat"><span class="small">Décomptes envoyés, pas encore payés</span><b>${eur(sumImp)}</b><span class="small">${impayes.length} chantier(s) · TVAC${aFacturer.length?" · + "+eur(sumAF)+" de devis à facturer":""}</span></div>
+    ${S.cfg.sousTraitance?`<div class="stat"><span class="small">Sous-traitance ce mois</span><b>${eur(decSum)}</b><span class="small">${gap>0?"dont "+eur(gap)+" au-dessus du tarif payé":"au tarif de "+S.cfg.taux+" €/h"}</span></div>`:`<div class="stat"><span class="small">Chantiers en cours ou prévus</span><b>${S.chantiers.filter(c=>!FINI.includes(c.statut)).length}</b><span class="small">${S.clients.length} client(s) enregistré(s)</span></div>`}
+  </div>
+  ${todo.length?`<h2>À faire</h2>${todo.join("")}`:""}
+  <h2>Prochains chantiers</h2>
+  ${soon.length?soon.map(cardChantier).join(""):`<div class="card empty">Aucun chantier prévu.<div class="btns" style="justify-content:center"><button class="btn" type="button" data-act="newChantier">Nouveau chantier</button></div></div>`}
+  <h2>Devis en attente de réponse</h2>
+  ${attente.length?attente.map(cardDevis).join(""):`<p class="small">Aucun devis envoyé en attente.</p>`}
+  <h2>Année ${y}</h2>
+  <div class="grid2">
+    <div class="stat"><span class="small">Chiffre d'affaires HTVA</span><b>${eur(caReg+caDev+caDec)}</b><span class="small">Régie ${eur(caReg)} · devis ${eur(caDev)}${S.cfg.sousTraitance?" · sous-traitance "+eur(caDec):""}</span></div>
+    <div class="stat"><span class="small">Gagné par heure-homme (chantiers terminés)</span><b>${ehReel?eur(ehReel):"–"}</b><span class="small">${ehReel?(ehReel>=S.cfg.taux?"au-dessus":"en dessous")+" de l'objectif de "+S.cfg.taux+" €":"Pointez les heures sur vos chantiers"}</span></div>
+  </div>
+  <div class="btns"><button class="btn" type="button" data-act="newChantier">+ Chantier</button><button class="btn" type="button" data-act="newDevis">+ Devis</button><button class="btn" type="button" data-act="newClient">+ Client</button><button class="btn alt" type="button" data-tabgo="clients">👤 Mes clients</button>${S.cfg.sousTraitance?`<button class="btn alt" type="button" data-act="newDecompte">+ Jour de sous-traitance</button>`:""}<button class="btn alt" type="button" data-tabgo="contrats">Contrats d'entretien</button></div>`;
+}
+
+/* ---------- Clients ---------- */
+function vClients(){
+  if(route.id)return fClient();
+  const q=(route.sub||"").toLowerCase();
+  const list=S.clients.filter(c=>!q||(c.nom+" "+(c.adresse||"")).toLowerCase().includes(q)).sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
+  return `<div class="row"><h1>Clients</h1><button class="btn" type="button" data-act="newClient">+ Client</button></div>
+  <label for="qClient">Rechercher</label><input id="qClient" type="search" value="${esc(route.sub||"")}" placeholder="Nom ou commune">
+  <div style="margin-top:12px">${list.length?list.map(c=>`<button class="card" type="button" data-open="clients:${c.id}"><div class="row"><h3>${esc(c.nom)}</h3><span class="pill">${esc(TYPES[c.type]||c.type)}</span></div><div class="small">${c.adresse?"📍 "+esc(c.adresse):""}</div></button>${c.adresse?`<a class="link small" style="display:block;margin:-4px 0 10px 4px" href="${esc(mapsUrl(c.adresse))}" target="_blank" rel="noopener">Ouvrir dans Google Maps ›</a>`:""}`).join(""):`<div class="empty">Aucun client${q?" trouvé":""}.</div>`}</div>`;
+}
+function fClient(){
+  const c=draft||(draft=route.id==="new"?{id:uid(),nom:"",type:"particulier",adresse:"",tel:"",email:"",tvaNum:"",tva:tvas()[0],note:""}:{...client(route.id)});
+  if(!c||!c.id)return`<div class="empty">Client introuvable.</div>`;
+  const hist=S.devis.filter(d=>d.clientId===c.id).length,ch=S.chantiers.filter(x=>x.clientId===c.id).length;
+  return `<button class="back" type="button" data-tabgo="clients">‹ Clients</button><h1>${route.id==="new"?"Nouveau client":esc(c.nom)}</h1>
+  ${route.id!=="new"?`<p class="small">${ch} chantier(s) · ${hist} devis</p>`:""}
+  <label for="c_nom">Nom</label><input id="c_nom" data-f="nom" value="${esc(c.nom)}" autocomplete="off">
+  <label for="c_type">Type</label><select id="c_type" data-f="type">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${c.type===k?"selected":""}>${v}</option>`).join("")}</select>
+  <label for="c_tva">TVA par défaut</label><select id="c_tva" data-f="tva">${tvas().map(v=>`<option value="${v}" ${num(c.tva)===v?"selected":""}>${String(v).replace(".",",")} %${v===6&&S.cfg.pays==="BE"?" (logement de plus de 10 ans)":v===0?" (sous-traitance, autoliquidation)":""}</option>`).join("")}</select>
+  <label for="c_adr">Adresse</label><input id="c_adr" data-f="adresse" value="${esc(c.adresse)}" placeholder="Rue, numéro, code postal, commune" autocomplete="street-address">${mapLink("c_adr",c.adresse)}
+  <div class="grid2"><div><label for="c_tel">Téléphone</label><input id="c_tel" data-f="tel" type="tel" value="${esc(c.tel)}"></div><div><label for="c_mail">E-mail</label><input id="c_mail" data-f="email" type="email" value="${esc(c.email)}"></div></div>
+  <label for="c_taux">Tarif préférentiel (€/h par homme)</label><input id="c_taux" inputmode="decimal" data-f="taux" value="${esc(c.taux||"")}" placeholder="Vide = tarif normal (${S.cfg.taux} €/h)">
+  <label for="c_tvan">N° TVA</label><input id="c_tvan" data-f="tvaNum" value="${esc(c.tvaNum)}">
+  <label for="c_note">Note</label><textarea id="c_note" data-f="note">${esc(c.note)}</textarea>
+  <div class="btns"><button class="btn" type="button" data-act="saveClient">Enregistrer</button>${route.id!=="new"?`<button class="btn alt" type="button" data-act="newDevisFor">Nouveau devis</button><button class="btn danger" type="button" data-act="delClient">Supprimer</button>`:""}</div>`;
+}
+
+/* ---------- Chantiers ---------- */
+function cardChantier(c){
+  const st=c.statut==="payé"?"p-ok":c.statut==="décompte envoyé"||c.statut==="terminé"?"p-warn":c.statut==="en cours"?"p-warn":"";
+  return `<button class="card" type="button" data-open="chantiers:${c.id}"><div class="row"><h3>${esc(c.titre||c.type)}</h3><span class="pill ${st}">${esc(c.statut)}</span></div><div class="small">${esc(cname(c.clientId))} · ${fdate(c.date)}${c.kit&&c.kit.length?" · "+c.kit.length+" machines":""}</div></button>`;
+}
+function vChantiers(){
+  if(route.id)return fChantier();
+  const list=[...S.chantiers].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  return `<div class="row"><h1>Chantiers</h1><button class="btn" type="button" data-act="newChantier">+ Chantier</button></div>
+  <div class="btns" style="margin-top:6px"><button class="btn alt" type="button" data-tabgo="contrats">Contrats d'entretien (${S.contrats.length})</button></div>
+  <div style="margin-top:12px">${list.length?list.map(cardChantier).join(""):`<div class="empty">Aucun chantier. Créez le premier en 30 secondes.</div>`}</div>`;
+}
+function cardDecompte(c,top){const t=regieTotals(c);const fr=(c.frais||[]).reduce((s,f)=>s+num(f.montant),0);return`<h2>${top?"✅ Décompte prêt à envoyer":"Décompte à envoyer"}</h2>
+  <div class="card">
+    <label for="h_trav">Travaux effectués (apparaît sur le décompte)</label><textarea id="h_trav" data-f="travaux" placeholder="Ex. taille des haies, tonte, évacuation des déchets verts">${esc(c.travaux||"")}</textarea>
+    <div class="tot" style="margin-top:8px"><span>Main-d'œuvre : ${hfmt(t.hh)} h × ${eur(t.taux)}</span><span class="num">${eur(t.mo)}</span><span>Achats refacturés HTVA</span><span class="num">${eur(t.achats)}</span><span>Frais du chantier</span><span class="num">${eur(t.autres)}</span><span>Total HTVA</span><span class="num">${eur(t.ht)}</span><span>TVA ${t.tx} %</span><span class="num">${eur(t.tva)}</span><span class="big">Total TVAC</span><span class="num big">${eur(t.ttc)}</span></div>
+    <p class="small" style="margin-top:6px">Gagné par heure, frais déduits : <b class="num">${t.hh?eur((t.ht-fr)/t.hh):"–"}</b>${c.envoyeLe?` · décompte envoyé le ${fdate(c.envoyeLe)}`:""}${c.payeLe?` · payé le ${fdate(c.payeLe)}`:""}</p>
+    <div class="btns"><button class="btn" type="button" data-act="copyRegie">Copier le décompte pour le client</button><button class="btn alt" type="button" data-act="copyRegieSmart">Copier pour ${esc(outil())}</button>${c.statut!=="décompte envoyé"&&c.statut!=="payé"?`<button class="btn alt" type="button" data-act="markEnvoye">Marquer envoyé</button>`:""}${c.statut==="décompte envoyé"?`<button class="btn alt" type="button" data-act="markPaye">Marquer payé</button><button class="btn alt" type="button" data-msg="relancePaie">Relance de paiement</button>`:""}</div>
+    <details style="margin-top:10px" ${top?"open":""}><summary class="small" style="cursor:pointer;font-weight:600">Aperçu du message au client</summary><div class="small" style="white-space:pre-wrap;margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)">${esc(regieText(c,true))}</div></details>
+  </div>`}
+const chantierRempli=c=>route.id!=="new"&&c.mode!=="devis"&&client(c.clientId)?.type!=="sous-traitance"&&(c.heures||[]).some(h=>num(h.h)*num(h.hommes)>0);
+const openSec={};
+const chantierFini=c=>chantierRempli(c)&&["terminé","décompte envoyé","payé"].includes(c.statut);
+const telIntl=t=>{t=(t||"").replace(/[^\d+]/g,"");if(t.startsWith("+"))return t.slice(1);if(t.startsWith("00"))return t.slice(2);if(t.startsWith("0"))return (S.cfg.indicatif||"32")+t.slice(1);return t};
+function cardStatut(c){
+  const steps=[["en cours","Travaux"],["terminé","Terminé"],["décompte envoyé","Décompte envoyé"],["payé","Payé"]];
+  const idx=c.statut==="prévu"?-1:steps.findIndex(x=>x[0]===c.statut);
+  const t=regieTotals(c);const cl=client(c.clientId)||{};const j=daysSince(c.envoyeLe);
+  const msg=regieText(c,true);const enc=encodeURIComponent(msg);
+  const next=c.statut==="payé"?`<p style="margin:8px 0 0"><b>✅ Payé${c.payeLe?" le "+fdate(c.payeLe):""}.</b> Chantier clôturé.</p>`
+   :c.statut==="décompte envoyé"?`<p class="small" style="margin:8px 0 0;${j>15?"color:var(--bad);font-weight:600":""}">Décompte envoyé ${c.envoyeLe?"le "+fdate(c.envoyeLe)+(j?" (il y a "+j+" jour"+(j>1?"s":"")+")":" (aujourd'hui)"):""}${j>15?" : paiement en retard, pensez à relancer.":"."}</p><div class="btns"><button class="btn" type="button" data-act="markPaye">💶 Marquer payé</button><button class="btn alt" type="button" data-msg="relancePaie">Relance de paiement</button></div>`
+   :c.statut==="terminé"?`<p class="small" style="margin:8px 0 0">À faire : envoyer le décompte de <b>${eur(t.ttc)}</b> à ${esc(cl.nom||"client")}.</p>
+     <div class="btns"><a class="btn" href="sms:${esc(cl.tel||"")}?&body=${enc}">💬 SMS</a><a class="btn" href="https://wa.me/${esc(telIntl(cl.tel))}?text=${enc}" target="_blank" rel="noopener">WhatsApp</a><a class="btn" href="mailto:${esc(cl.email||"")}?subject=${encodeURIComponent("Décompte "+(c.titre||c.type)+" - "+ent())}&body=${enc}">✉️ E-mail</a><button class="btn alt" type="button" data-act="copyRegie">Copier</button></div>
+     <div class="btns"><button class="btn alt" type="button" data-act="markEnvoye">✔ Marquer le décompte envoyé</button><button class="btn alt" type="button" data-act="copyRegieSmart">Copier pour ${esc(outil())}</button></div>`
+   :`<div class="btns"><button class="btn" type="button" data-act="markTermine">✔ Chantier terminé</button></div>`;
+  return `<div class="card" style="border:2px solid var(--green)">
+  <div style="display:flex;gap:4px;margin-bottom:6px">${steps.map((x,i)=>`<div style="flex:1;text-align:center"><div style="height:6px;border-radius:3px;background:${i<=idx?"var(--green)":"var(--line)"}"></div><div class="small" style="margin-top:4px;${i===idx?"font-weight:700;color:var(--fg)":""}">${x[1]}</div></div>`).join("")}</div>
+  ${next}</div>`}
+function cardResume(c){const t=regieTotals(c);const b=benefice(c);const cl=client(c.clientId)||{};const a=adrReelle(c.adresse,c.clientId);
+  const ds=(c.heures||[]).map(h=>h.d).filter(Boolean).sort();
+  return `<div class="card"><div class="row"><button type="button" data-open="clients:${c.clientId}" style="background:none;border:0;padding:0;font:700 16px var(--font);color:var(--fg);text-align:left;cursor:pointer">👤 ${esc(cl.nom||"")} ›</button><span class="small">${ds.length?fdate(ds[0])+(ds.length>1&&ds[ds.length-1]!==ds[0]?" → "+fdate(ds[ds.length-1]):""):""}</span></div>
+  ${a?`<a class="link small" href="${esc(mapsUrl(a))}" target="_blank" rel="noopener">📍 ${esc(a)}</a>`:""}
+  <div class="tot" style="margin-top:8px"><span>${hfmt(t.hh)} h de travail · ${b.jours} jour(s)</span><span class="num">${eur(t.mo)}</span><span>Frais et achats</span><span class="num">${eur(t.autres+t.achats)}</span><span class="big">À facturer TVAC</span><span class="num big">${eur(t.ttc)}</span><span>Mon bénéfice estimé</span><span class="num" style="font-weight:700;color:${b.net<0?"var(--bad)":"inherit"}">${eur(b.net)}</span></div></div>`}
+const sec=(k,title,html,open)=>`<details data-sec="${k}" ${(openSec[k]??open)?"open":""} style="margin-top:12px"><summary style="cursor:pointer;font-weight:600;padding:10px 0">${title}</summary>${html}</details>`;
+function fChantier(){
+  const c=draft||(draft=route.id==="new"?{id:uid(),clientId:route.sub||"",titre:"",type:"",adresse:client(route.sub)?.adresse||"",date:today(),statut:"prévu",mode:"régie",kit:[],lignes:fraisDefaut(),note:"",m3:"",created:today()}:JSON.parse(JSON.stringify(S.chantiers.find(x=>x.id===route.id)||{})));
+  if(c&&c.id){c.photos=c.photos||[];c.kit=c.kit||[];c.checklist=c.checklist||[];c.heures=c.heures||[];c.frais=c.frais||[];c.lignes=c.lignes||[];if(!c.mode)c.mode=isRegie(c)?"régie":"devis"}
+  if(!c||!c.id)return`<div class="empty">Chantier introuvable.</div>`;
+  const kit=(S.cfg.kits||{})[c.type]||[];const all=[...new Set([...kit,...c.kit])];
+  const chip=k=>{const on=c.kit.includes(k);return`<button type="button" class="chip ${on?"on":""}" aria-pressed="${on}" data-kit="${esc(k)}">${on?"✓ ":"+ "}${esc(k)}</button>`};
+  const cats=machinesObj();if((S.cfg.kitsExtra||[]).length)cats["Mes autres machines"]=[...new Set([...(cats["Mes autres machines"]||[]),...S.cfg.kitsExtra])];
+  const nbAll=new Set(Object.values(cats).flat()).size;
+  return `<button class="back" type="button" data-tabgo="chantiers">‹ Chantiers</button><h1>${route.id==="new"?"Nouveau chantier":esc(c.titre||c.type)}</h1>
+  ${chantierRempli(c)?cardStatut(c):""}
+  ${chantierFini(c)?cardResume(c)+sec("dec","🧾 Voir le décompte détaillé",cardDecompte(c,true),false)+sec("ben","💶 Détail de ce que je gagne",cardBenef(c),false)+`<details data-sec="edit" ${openSec.edit?"open":""} style="margin-top:4px"><summary style="cursor:pointer;font-weight:600;padding:10px 0">✏️ Modifier le chantier (client, heures, frais, photos…)</summary>`
+   :chantierRempli(c)?cardDecompte(c,true)+cardBenef(c)+`<h2>Détails du chantier</h2>`:""}
+  <label for="h_cli">Client</label>${clientSelect("h_cli","clientId",c.clientId)}${client(c.clientId)&&!(draft&&draft._nc)?`<button type="button" class="chip" style="margin-top:6px" data-open="clients:${c.clientId}">👤 Ouvrir la fiche de ${esc(client(c.clientId).nom)} ›</button>`:""}
+  <label>Facturation</label><div class="chips"><button type="button" class="chip ${c.mode!=="devis"?"on":""}" aria-pressed="${c.mode!=="devis"}" data-mode="régie">En régie (à l'heure)</button><button type="button" class="chip ${c.mode==="devis"?"on":""}" aria-pressed="${c.mode==="devis"}" data-mode="devis">Au devis (prix fixé)</button></div>
+  <label>Type de travail</label><div class="chips">${jobsList().map(j=>`<button type="button" class="chip ${c.type===j?"on":""}" aria-pressed="${c.type===j}" data-job="${j}">${j}</button>`).join("")}</div>
+  <label>Machines et matériel ${kit.length?"(cochés d'avance pour « "+esc(c.type)+" »)":""}</label>${c.type&&c.kit.length&&JSON.stringify([...c.kit].sort())!==JSON.stringify([...kit].sort())?`<button type="button" class="chip" style="margin-bottom:6px" data-act="kitMemo">⭐ Toujours proposer ce matériel pour « ${esc(c.type)} »</button>`:""}
+  <div class="chips">${all.length?all.map(chip).join(""):'<span class="small">Choisissez un type de travail, ou ouvrez la liste complète.</span>'}</div>
+  <button type="button" class="chip" style="margin-top:8px" data-act="kitAll" aria-expanded="${kitAll}">${kitAll?"▲ Masquer la liste complète":"▼ Toutes les machines ("+nbAll+")"}</button>
+  ${kitAll?Object.entries(cats).map(([cat,l])=>`<div class="small" style="margin:10px 0 4px;font-weight:600">${esc(cat)}</div><div class="chips">${l.map(chip).join("")}</div>`).join("")+`<div class="row" style="gap:8px;margin-top:10px"><input id="h_kitnew" placeholder="Autre machine (ex. Fendeuse)" style="flex:1"><button type="button" class="btn" data-act="kitAdd">Ajouter</button></div>`:""}
+  <label for="h_tit">Titre</label><input id="h_tit" data-f="titre" value="${esc(c.titre)}" placeholder="Ex. Terrasse + huilage">
+  <label for="h_cons">Consignes pour les ouvriers (visibles par eux, sans prix)</label><textarea id="h_cons" data-f="consignes" placeholder="Ex. clé chez la voisine, déchets à la décharge habituelle">${esc(c.consignes||"")}</textarea>
+  <label for="h_adr">Adresse du chantier</label><input id="h_adr" data-f="adresse" value="${esc(c.adresse)}" placeholder="${esc(client(c.clientId)?.adresse||"Rue, numéro, code postal, commune")}">
+  <div class="row" style="justify-content:flex-start;gap:12px;flex-wrap:wrap">${mapLink("h_adr",adrReelle(c.adresse,c.clientId))}${client(c.clientId)?.adresse?`<button type="button" class="chip" style="margin-top:6px" data-act="adrClient">↺ Même adresse que le client</button>`:""}</div>
+  <div class="grid2"><div><label for="h_date">Date</label><input id="h_date" type="date" data-f="date" value="${esc(c.date)}"></div>
+  <div><label for="h_st">Statut</label><select id="h_st" data-f="statut">${CSTAT.map(s=>`<option ${c.statut===s?"selected":""}>${s}</option>`).join("")}</select></div></div>
+  <label for="h_taux">Tarif horaire de ce chantier (€/h par homme)</label><input id="h_taux" inputmode="decimal" data-f="taux" value="${esc(c.taux||"")}" placeholder="Vide = ${tauxFor({clientId:c.clientId})} €/h${num(client(c.clientId)?.taux)?" (tarif du client)":""}">
+  <label for="h_m3">Déchets verts estimés (m³)</label><input id="h_m3" data-f="m3" inputmode="decimal" value="${esc(c.m3)}">
+  <label for="h_note">Note (accès, code, particularités)</label><textarea id="h_note" data-f="note">${esc(c.note)}</textarea>
+  ${adrReelle(c.adresse,c.clientId)?`<p style="margin-top:8px"><a class="link" href="${esc(mapsUrl(adrReelle(c.adresse,c.clientId)))}" target="_blank" rel="noopener">Itinéraire vers le chantier ›</a></p>`:""}
+  <h2>Étapes</h2>
+  <div class="card">${c.checklist.length?c.checklist.map((x,i)=>`<button type="button" class="check ${x.done?"done":""}" data-chk="${i}" aria-pressed="${!!x.done}"><span class="box">${x.done?"✓":""}</span><span>${esc(x.t)}</span></button>`).join(""):'<p class="small">Choisissez un type de travail : les étapes habituelles apparaissent ici.</p>'}</div>
+  <h2>Photos du chantier (${(c.photos||[]).length})</h2>
+  <div class="card">
+    ${(c.photos||[]).length?`<div class="photos">${c.photos.map((ph,i)=>{const src=phSrc(ph);return`<div class="photo"><a href="${esc(src)}" target="_blank" rel="noopener"><img src="${esc(src)}" alt="Photo ${ph.tag||""} du ${fdate(ph.d)}" loading="lazy"></a>${ph.tag?`<span class="tag">${esc(ph.tag)}</span>`:""}<button class="x" type="button" data-delph="${i}" aria-label="Supprimer la photo">×</button></div>`}).join("")}</div>`:'<p class="small">Avant, pendant, après : les photos restent attachées au chantier.</p>'}
+    <div class="btns" style="margin-top:8px">${["avant","pendant","après"].map(t=>`<label class="btn filebtn">📷 ${t[0].toUpperCase()+t.slice(1)}<input type="file" accept="image/*" capture="environment" data-photo="${t}" aria-label="Prendre une photo ${t}"></label>`).join("")}<label class="btn alt filebtn">🖼️ Galerie<input type="file" accept="image/*" multiple data-photo="" aria-label="Choisir des photos dans la galerie"></label></div>
+  </div>
+  <h2>Heures pointées</h2>
+  <div class="card">
+    ${c.heures.map((h,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 64px 64px 36px"><input type="date" aria-label="Date" data-a="heures" data-i="${i}" data-k="d" value="${esc(h.d)}"><input aria-label="Hommes" inputmode="numeric" data-a="heures" data-i="${i}" data-k="hommes" value="${esc(h.hommes)}"><input aria-label="Heures" inputmode="decimal" data-a="heures" data-i="${i}" data-k="h" value="${esc(h.h)}"><button class="x" type="button" data-adel="heures" data-i="${i}" aria-label="Retirer">×</button></div>${num(h.hommes)>1?`<div style="margin:-2px 0 8px"><select aria-label="Ouvrier" data-a="heures" data-i="${i}" data-k="ouv"><option value="">Moi + ouvrier(s) au taux par défaut (${eur(CC("tauxOuvrier"))}/h)</option>${(S.cfg.ouvriers||[]).map(o=>`<option value="${esc(o.id)}" ${h.ouv===o.id?"selected":""}>Moi + ${esc(o.nom)} (${eur(o.taux)}/h)</option>`).join("")}</select></div>`:""}`).join("")||'<p class="small">Aucune heure pointée.</p>'}
+    <div class="small" style="display:grid;grid-template-columns:minmax(0,1fr) 64px 64px 36px;gap:6px;margin-top:4px"><span></span><span>hommes</span><span>heures</span><span></span></div>
+    <div class="btns"><button class="btn alt" type="button" data-act="addHeure">+ Aujourd'hui</button></div>
+  </div>
+  <h2>Achats et tickets</h2>
+  <div class="card">
+    ${c.frais.map((f,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 84px 36px"><div><select aria-label="Catégorie" data-a="frais" data-i="${i}" data-k="cat">${FRAIS.map(x=>`<option ${f.cat===x?"selected":""}>${x}</option>`).join("")}</select><input aria-label="Détail" placeholder="Détail, ex. 3 sacs de terreau" data-a="frais" data-i="${i}" data-k="lib" value="${esc(f.lib||"")}" style="margin-top:4px">${c.mode!=="devis"?`<label class="opt"><input type="checkbox" data-a="frais" data-i="${i}" data-k="refact" ${f.refact?"checked":""}> à refacturer au client</label>`:""}${S.cfg.notesFrais?`<label class="opt"><input type="checkbox" data-a="frais" data-i="${i}" data-k="smart" ${f.smart?"checked":""}> déclaré en note de frais</label>`:""}</div><input aria-label="Montant TVAC" inputmode="decimal" data-a="frais" data-i="${i}" data-k="montant" value="${esc(f.montant)}"><button class="x" type="button" data-adel="frais" data-i="${i}" aria-label="Retirer">×</button></div>`).join("")||'<p class="small">Achats (terreau, plantes, vis…), décharge, carburant : notez-les ici avec le montant du ticket TVAC. Cochez « à refacturer » pour les ajouter au décompte du client.</p>'}
+    <div class="btns"><button class="btn alt" type="button" data-act="addFrais">+ Frais</button></div>
+  </div>
+  ${route.id!=="new"&&client(c.clientId)?.type==="sous-traitance"?`<div class="banner" style="margin-top:12px">${esc(cname(c.clientId))} est un donneur d'ordre : ces heures se facturent dans son décompte mensuel de sous-traitance, pas en décompte client.<div class="btns" style="margin-top:8px"><button class="btn" type="button" data-act="toDecompte">Ajouter ces heures au décompte du mois</button></div></div>`:""}
+  ${c.mode!=="devis"?`<h2>Frais du chantier (facturés au client)</h2><p class="small">Mis d'office. Changez la quantité ou le prix, ou retirez une ligne avec ×.</p>
+  <div class="card">
+    ${c.lignes.map((l,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 56px 76px 36px"><input aria-label="Libellé" data-a="lignes" data-i="${i}" data-k="n" value="${esc(l.n)}"><input aria-label="Quantité" inputmode="decimal" data-a="lignes" data-i="${i}" data-k="q" value="${esc(l.q)}"><input aria-label="Prix HTVA" inputmode="decimal" data-a="lignes" data-i="${i}" data-k="p" value="${esc(l.p)}"><button class="x" type="button" data-adel="lignes" data-i="${i}" aria-label="Retirer">×</button></div>`).join("")||'<p class="small">Déplacement, évacuation des déchets, location de remorque…</p>'}
+    <div class="chips" style="margin-top:8px">${S.cfg.catalogue.map((x,i)=>/déplacement|évacuation|remorque|transbordement/i.test(x.n)?`<button type="button" class="chip" data-addl="${i}">+ ${esc(x.n.split(" (")[0].split(",")[0])} · ${esc(x.u)}</button>`:"").join("")}${c.lignes.length?"":`${fraisDefaut().length?`<button type="button" class="chip on" data-act="fraisStd">+ Frais habituels (${esc(fraisDefaut().map(f=>f.n.toLowerCase()).join(", "))})</button>`:""}`}<button type="button" class="chip" data-act="addLigneR">+ Ligne libre</button></div>
+  </div>
+  ${route.id!=="new"&&!chantierRempli(c)?cardDecompte(c,false):chantierRempli(c)?`<p class="small" style="margin-top:12px">Le décompte et le bénéfice sont affichés tout en haut de la fiche.</p>`:""}`:""}
+  ${route.id!=="new"&&c.mode==="devis"?(()=>{const st=chantierStats(c);return`<div class="card"><div class="tot"><span>Heures-homme</span><span class="num">${hfmt(st.hh)} h</span><span>Devis acceptés HTVA</span><span class="num">${eur(st.ht)}</span><span>Frais</span><span class="num">${eur(st.frais)}</span><span class="big">Gagné par heure</span><span class="num big" style="color:${st.eh&&st.eh<tauxFor(c)?"var(--bad)":"inherit"}">${st.hh?eur(st.eh):"–"}</span></div></div>`})():""}
+  ${route.id!=="new"&&!chantierRempli(c)?cardBenef(c):""}
+  ${chantierFini(c)?"</details>":""}
+  ${route.id!=="new"?`<h2>Messages au client</h2><div class="chips"><button class="chip" type="button" data-msg="confirm">Confirmer la date</button><button class="chip" type="button" data-msg="veille">Rappel la veille</button><button class="chip" type="button" data-msg="fini">Chantier terminé</button><button class="chip" type="button" data-msg="avis">Demander un avis Google</button></div>
+  <h2>Équipe</h2><div class="chips"><button class="chip" type="button" data-act="shareMission" data-tel="">📲 Envoyer ce chantier à un ouvrier</button>${(S.cfg.ouvriers||[]).filter(o=>o.tel).map(o=>`<button class="chip" type="button" data-act="shareMission" data-tel="${esc(o.tel)}">📲 À ${esc(o.nom)}</button>`).join("")}</div><p class="small" style="margin-top:6px">Il reçoit l'adresse, le matériel, les étapes et vos consignes, sans aucun prix.</p>`:""}
+  <div class="btns"><button class="btn" type="button" data-act="saveChantier">Enregistrer</button>${route.id!=="new"?`${c.mode==="devis"?`<button class="btn alt" type="button" data-act="devisFromChantier">Faire le devis</button>`:""}<button class="btn danger" type="button" data-act="delChantier">Supprimer</button>`:""}</div>
+  <div id="copyOut"></div>`;
+}
+function clientSelect(id,f,val){
+  const list=[...S.clients].sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
+  const nc=draft&&draft._nc;
+  return `<select id="${id}" data-f="${f}"><option value="">Choisir un client…</option><option value="__new" ${nc?"selected":""}>➕ Nouveau client…</option>${list.map(c=>`<option value="${c.id}" ${c.id===val&&!nc?"selected":""}>${esc(c.nom)}</option>`).join("")}</select>
+  ${nc?`<div class="card" style="margin-top:8px"><b>Nouveau client</b>
+    <label for="nc_nom">Nom</label><input id="nc_nom" data-nc="nom" value="${esc(nc.nom)}" autocomplete="off">
+    <div class="grid2"><div><label for="nc_tel">Téléphone</label><input id="nc_tel" type="tel" data-nc="tel" value="${esc(nc.tel)}"></div><div><label for="nc_mail">E-mail</label><input id="nc_mail" type="email" data-nc="email" value="${esc(nc.email)}"></div></div>
+    <label for="nc_adr">Adresse</label><input id="nc_adr" data-nc="adresse" value="${esc(nc.adresse)}" placeholder="Rue, numéro, code postal, commune">${mapLink("nc_adr",nc.adresse)}
+    <label for="nc_type">Type</label><select id="nc_type" data-nc="type">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${nc.type===k?"selected":""}>${v}</option>`).join("")}</select>
+    <p class="small">Le client est créé en même temps que vous enregistrez.</p></div>`:""}`;
+}
+
+/* ---------- Devis ---------- */
+function cardDevis(d){
+  const t=devisTotals(d);const cls={accepté:"p-ok",facturé:"p-ok",refusé:"p-bad",envoyé:"p-warn"}[d.statut]||"";
+  return `<button class="card" type="button" data-open="devis:${d.id}"><div class="row"><h3>${esc(d.numero)} · ${esc(cname(d.clientId))}</h3><span class="pill ${cls}">${esc(d.statut)}</span></div><div class="row small"><span>${fdate(d.date)}${d.objet?" · "+esc(d.objet):""}</span><span class="num">${eur(t.ht)} HTVA</span></div></button>`;
+}
+function vDevis(){
+  if(route.id)return fDevis();
+  const list=[...S.devis].sort((a,b)=>(b.numero||"").localeCompare(a.numero||""));
+  return `<div class="row"><h1>Devis</h1><button class="btn" type="button" data-act="newDevis">+ Devis</button></div>
+  <div style="margin-top:12px">${list.length?list.map(cardDevis).join(""):`<div class="empty">Aucun devis. Les prix viennent de votre grille.</div>`}</div>`;
+}
+function fDevis(){
+  let d=draft;
+  if(!d){
+    if(route.id==="new"){
+      const ch=route.sub&&S.chantiers.find(c=>c.id===route.sub);const cli=ch?ch.clientId:(route.sub&&client(route.sub)?route.sub:"");
+      const site=S.cfg.decharges[0];
+      d={id:uid(),numero:nextNumero(),clientId:cli,chantierId:ch?ch.id:"",objet:ch?ch.titre||ch.type:"",date:today(),lignes:[],tva:num(client(cli)?.tva??tvas()[0]),
+         evac:{on:!!(ch&&num(ch.m3)),site:site?.id||"",t:ch&&num(ch.m3)?+(num(ch.m3)*0.3).toFixed(2):0.25,km:site?site.km*2:18,h:site?+((site.km*2/30)+0.75).toFixed(2):1.5},statut:"brouillon",created:today()};
+    }else{const src=S.devis.find(x=>x.id===route.id);if(!src)return`<div class="empty">Devis introuvable.</div>`;d=JSON.parse(JSON.stringify(src))}
+    draft=d;
+  }
+  const t=devisTotals(d);const ev=d.evac||{};
+  const chs=S.chantiers.filter(c=>!d.clientId||c.clientId===d.clientId);
+  return `<button class="back" type="button" data-tabgo="devis">‹ Devis</button><h1>${esc(d.numero)}</h1>
+  <label for="d_cli">Client</label>${clientSelect("d_cli","clientId",d.clientId)}
+  <div class="grid2"><div><label for="d_ch">Chantier</label><select id="d_ch" data-f="chantierId"><option value="">Aucun</option>${chs.map(c=>`<option value="${c.id}" ${c.id===d.chantierId?"selected":""}>${esc(c.titre||c.type)} · ${fdate(c.date)}</option>`).join("")}</select></div>
+  <div><label for="d_date">Date</label><input id="d_date" type="date" data-f="date" value="${esc(d.date)}"></div></div>
+  <label for="d_obj">Objet</label><input id="d_obj" data-f="objet" value="${esc(d.objet)}" placeholder="Ex. Élagage et rabattage de haies">
+  <h2>Prestations de votre grille</h2>
+  <div class="chips">${S.cfg.catalogue.map((c,i)=>`<button type="button" class="chip" data-cat="${i}">+ ${esc(c.n)}</button>`).join("")||'<span class="small">Catalogue vide : voir Réglages.</span>'}</div>
+  <div class="card" style="margin-top:10px">
+    <div class="line small" style="border:0;padding-top:0"><span>Prestation</span><span>Qté</span><span>Prix € HT</span><span></span></div>
+    ${(d.lignes||[]).map((l,i)=>`<div class="line"><div><input aria-label="Prestation" data-l="${i}" data-lf="n" value="${esc(l.n)}"><div class="small">${esc(l.u)} · ${eur(num(l.q)*num(l.p))}</div><label class="opt"><input type="checkbox" data-l="${i}" data-lf="opt" ${l.opt?"checked":""}> option (hors total)</label></div><input aria-label="Quantité" inputmode="decimal" data-l="${i}" data-lf="q" value="${esc(l.q)}"><input aria-label="Prix unitaire" inputmode="decimal" data-l="${i}" data-lf="p" value="${esc(l.p)}"><button class="x" type="button" data-dell="${i}" aria-label="Retirer la ligne">×</button></div>`).join("")||'<p class="small">Touchez une prestation ci-dessus pour l\'ajouter.</p>'}
+    <div class="btns" style="margin-top:8px"><button class="btn alt" type="button" data-act="addLine">+ Ligne libre</button></div>
+  </div>
+  <h2>Évacuation déchets verts</h2>
+  <div class="card">
+    <label style="display:flex;gap:8px;align-items:center;margin:0;color:var(--fg)"><input type="checkbox" data-ev="on" ${ev.on?"checked":""} style="width:auto;min-height:0"> Ajouter une ligne d'évacuation</label>
+    ${ev.on?`<label for="e_site">Décharge (privées uniquement)</label><select id="e_site" data-ev="site">${S.cfg.decharges.map(s=>`<option value="${s.id}" ${s.id===ev.site?"selected":""}>${esc(s.n)} · ${s.t?s.t+" €/t":s.f?s.f+" €/visite":"prix à demander"}${s.min?", min. "+s.min+" €":""}</option>`).join("")}</select>${S.cfg.decharges.length?"":'<p class="small">Ajoutez vos décharges et leurs prix dans Réglages.</p>'}
+    <div class="grid2"><div><label for="e_t">Poids (t)</label><input id="e_t" inputmode="decimal" data-ev="t" value="${esc(ev.t)}"></div><div><label for="e_km">Km aller-retour</label><input id="e_km" inputmode="decimal" data-ev="km" value="${esc(ev.km)}"></div></div>
+    <label for="e_h">Temps (route, file, pesée, déchargement) en heures</label><input id="e_h" inputmode="decimal" data-ev="h" value="${esc(ev.h)}">
+    <p class="small" style="margin-top:8px">Coût réel + ${Math.round(S.cfg.marge*100)} % : <b class="num">${eur(t.ev)}</b>. Après le voyage, remplacez le poids par le poids net du ticket.</p>`:""}
+  </div>
+  <div class="card">
+    <div class="grid2"><div><label for="d_tva">TVA</label><select id="d_tva" data-f="tva">${tvas().map(v=>`<option value="${v}" ${num(d.tva)===v?"selected":""}>${String(v).replace(".",",")} %</option>`).join("")}</select></div>
+    <div><label for="d_st">Statut</label><select id="d_st" data-f="statut">${DSTAT.map(s=>`<option ${d.statut===s?"selected":""}>${s}</option>`).join("")}</select></div></div>
+    <div class="grid2"><div><label for="d_he">Heures-homme prévues</label><input id="d_he" inputmode="decimal" data-f="heuresEst" value="${esc(d.heuresEst||"")}"></div>
+    <div><label for="d_ac">Acompte (%)</label><input id="d_ac" inputmode="decimal" data-f="acompte" value="${esc(d.acompte||"")}"></div></div>
+    <label for="d_val">Validité du devis (jours)</label><input id="d_val" inputmode="numeric" data-f="validite" value="${esc(d.validite||"")}" placeholder="30">
+    ${t.eh?(()=>{const tx=tauxFor(d);return`<p style="margin-top:8px"><span class="pill ${t.eh>=tx?"p-ok":"p-bad"}">${eur(t.eh)} par heure-homme</span> <span class="small">${t.eh>=tx?"objectif de "+tx+" € atteint":"sous l'objectif de "+tx+" € : augmentez le prix ou réduisez le temps"}</span></p>`})():""}
+    <div class="tot"><span>Prestations</span><span class="num">${eur(t.lignes)}</span><span>Évacuation</span><span class="num">${eur(t.ev)}</span><span>Total HTVA</span><span class="num">${eur(t.ht)}</span><span>TVA ${num(d.tva)} %</span><span class="num">${eur(t.tva)}</span><span class="big">Total TVAC</span><span class="num big">${eur(t.ttc)}</span>${t.options?`<span>Options proposées</span><span class="num">${eur(t.options)}</span>`:""}${t.acompte?`<span>Acompte ${num(d.acompte)} %</span><span class="num">${eur(t.acompte)}</span>`:""}</div>
+    ${num(d.tva)===6&&S.cfg.pays==="BE"?'<p class="small" style="margin-top:8px">TVA 6 % : logement privé de plus de 10 ans, attestation du client à joindre.</p>':""}
+  </div>
+  <div class="btns"><button class="btn" type="button" data-act="saveDevis">Enregistrer</button><button class="btn alt" type="button" data-act="copyDevis">Copier pour ${esc(outil())}</button>${route.id!=="new"?`<button class="btn alt" type="button" data-act="dupDevis">Dupliquer</button><button class="btn alt" type="button" data-msg="relance">Message de relance</button><button class="btn danger" type="button" data-act="delDevis">Supprimer</button>`:""}</div>
+  <div id="copyOut"></div>`;
+}
+function devisText(d){
+  const t=devisTotals(d);const L=[];
+  L.push(`Devis ${d.numero} du ${fdate(d.date)}`,`Client : ${cname(d.clientId)}`);if(d.objet)L.push(`Objet : ${d.objet}`);L.push("");
+  (d.lignes||[]).filter(l=>!l.opt).forEach(l=>L.push(`${l.n} : ${l.q} ${l.u} × ${eur(l.p)} = ${eur(num(l.q)*num(l.p))} HTVA`));
+  if(d.evac&&d.evac.on){const s=S.cfg.decharges.find(x=>x.id===d.evac.site);L.push(`Évacuation déchets verts (${d.evac.t} t, ${s?s.n:"décharge"}) : ${eur(t.ev)} HTVA`)}
+  L.push("",`Total HTVA : ${eur(t.ht)}`,`TVA ${num(d.tva)} % : ${eur(t.tva)}`,`Total TVAC : ${eur(t.ttc)}`);
+  if(num(d.tva)===0)L.push("Autoliquidation : TVA due par le cocontractant.");
+  if(t.acompte)L.push(`Acompte à la commande (${num(d.acompte)} %) : ${eur(t.acompte)}`);
+  const opts=(d.lignes||[]).filter(l=>l.opt);if(opts.length){L.push("","Options (non comprises dans le total) :");opts.forEach(l=>L.push(`${l.n} : ${l.q} ${l.u} × ${eur(l.p)} = ${eur(num(l.q)*num(l.p))} HTVA`))}
+  L.push("",`Devis valable ${num(d.validite)||30} jours.`);if(S.cfg.conditions)L.push(S.cfg.conditions);
+  return L.join("\n");
+}
+
+function messageText(kind,obj){
+  const c=client(obj.clientId)||{};const nom=(c.nom||"").split(" ")[0]||"";
+  const bonjour=c.type==="particulier"?`Bonjour ${nom},`:"Bonjour,";
+  const sign="\n\n"+signLines().join("\n");
+  if(kind==="confirm")return`${bonjour}\n\nJe vous confirme notre passage le ${fdate(obj.date)} pour : ${obj.titre||obj.type}.\nN'hésitez pas à me prévenir si l'accès pose problème.${sign}`;
+  if(kind==="veille")return`${bonjour}\n\nPetit rappel : nous passons demain (${fdate(obj.date)}) pour ${(obj.titre||obj.type||"").toLowerCase()}. Merci de laisser l'accès libre${obj.type==="Terrasse"||obj.type==="Toiture"?" et un robinet d'eau disponible":""}.${sign}`;
+  if(kind==="fini")return`${bonjour}\n\nLe chantier « ${obj.titre||obj.type} » est terminé. Je vous envoie le décompte des heures et des achats dans les prochains jours. Merci pour votre confiance !${sign}`;
+  if(kind==="avis")return`${bonjour}\n\nMerci encore pour votre confiance. Si vous êtes satisfait du travail, un avis sur notre fiche Google « ${ent()} » nous aiderait beaucoup. ${S.cfg.avisLien?"Voici le lien : "+S.cfg.avisLien:"Il suffit de chercher "+ent()+" sur Google Maps et de cliquer sur « Donner un avis »."}${sign}`;
+  if(kind==="relancePaie"){const t=regieTotals(obj);return`${bonjour}\n\nSauf erreur de ma part, le décompte des travaux « ${obj.titre||obj.type} » envoyé le ${fdate(obj.envoyeLe||obj.date)} (${eur(t.ttc)} TVAC) n'est pas encore réglé. Pourriez-vous faire le nécessaire ? Si c'est déjà fait, merci de ne pas tenir compte de ce message.${sign}`}
+  if(kind==="relance")return`${bonjour}\n\nJe reviens vers vous concernant le devis ${obj.numero} (${obj.objet||"travaux"}) envoyé le ${fdate(obj.sentAt||obj.date)}. Avez-vous pu le regarder ? Je reste disponible pour l'ajuster ou en parler.${sign}`;
+  return"";
+}
+
+/* ---------- Contrats d'entretien ---------- */
+function vContrats(){
+  if(route.id)return fContrat();
+  const list=[...S.contrats].sort((a,b)=>(a.prochain||"9").localeCompare(b.prochain||"9"));
+  const annuel=list.filter(k=>k.actif!==false).reduce((s,k)=>s+passagesSaison(k)*num(k.prixPassage),0);
+  return `<button class="back" type="button" data-tabgo="chantiers">‹ Chantiers</button><div class="row"><h1>Contrats d'entretien</h1><button class="btn" type="button" data-act="newContrat">+ Contrat</button></div>
+  <p class="small">Tonte, taille de haies, nettoyage annuel : l'app propose chaque passage et crée le chantier. Revenu prévu sur une saison : <b class="num">${eur(annuel)}</b> HTVA.</p>
+  <div style="margin-top:12px">${list.length?list.map(k=>`<button class="card" type="button" data-open="contrats:${k.id}"><div class="row"><h3>${esc(k.titre)} · ${esc(cname(k.clientId))}</h3><span class="pill ${k.actif===false?"":"p-ok"}">${k.actif===false?"en pause":"actif"}</span></div><div class="row small"><span>Toutes les ${num(k.freqSem)||2} sem., ${MOIS[(num(k.moisDebut)||1)-1]} → ${MOIS[(num(k.moisFin)||12)-1]} · prochain : ${fdate(k.prochain)}</span><span class="num">${eur(k.prixPassage)}</span></div></button>`).join(""):`<div class="empty">Aucun contrat. Un client tondu toutes les deux semaines d'avril à octobre, c'est environ ${passagesSaison({freqSem:2,moisDebut:4,moisFin:10})} passages par an.</div>`}</div>`;
+}
+function fContrat(){
+  const k=draft||(draft=route.id==="new"?{id:uid(),clientId:"",titre:"Tonte",type:"Jardin",freqSem:2,moisDebut:4,moisFin:10,prixPassage:0,prochain:today(),actif:true,note:""}:JSON.parse(JSON.stringify(S.contrats.find(x=>x.id===route.id)||{})));
+  if(!k||!k.id)return`<div class="empty">Contrat introuvable.</div>`;
+  const opt=(v)=>MOIS.map((m,i)=>`<option value="${i+1}" ${num(v)===i+1?"selected":""}>${m}</option>`).join("");
+  return `<button class="back" type="button" data-tabgo="contrats">‹ Contrats</button><h1>${route.id==="new"?"Nouveau contrat":esc(k.titre)}</h1>
+  <label for="k2_cli">Client</label>${clientSelect("k2_cli","clientId",k.clientId)}
+  <label for="k2_tit">Prestation</label><input id="k2_tit" data-f="titre" value="${esc(k.titre)}" placeholder="Ex. Tonte + bordures">
+  <label>Type de travail</label><div class="chips">${jobsList().map(j=>`<button type="button" class="chip ${k.type===j?"on":""}" aria-pressed="${k.type===j}" data-ktype="${j}">${j}</button>`).join("")}</div>
+  <div class="grid2"><div><label for="k2_f">Toutes les … semaines</label><input id="k2_f" inputmode="numeric" data-f="freqSem" value="${esc(k.freqSem)}"></div>
+  <div><label for="k2_p">Prix par passage (€ HTVA)</label><input id="k2_p" inputmode="decimal" data-f="prixPassage" value="${esc(k.prixPassage)}"></div>
+  <div><label for="k2_a">De</label><select id="k2_a" data-f="moisDebut">${opt(k.moisDebut)}</select></div>
+  <div><label for="k2_b">À</label><select id="k2_b" data-f="moisFin">${opt(k.moisFin)}</select></div></div>
+  <label for="k2_n">Prochain passage</label><input id="k2_n" type="date" data-f="prochain" value="${esc(k.prochain)}">
+  <label style="display:flex;gap:8px;align-items:center;color:var(--fg)"><input type="checkbox" data-f="actif" ${k.actif!==false?"checked":""} style="width:auto;min-height:0"> Contrat actif</label>
+  <p class="small">${passagesSaison(k)} passages par saison, soit <b class="num">${eur(passagesSaison(k)*num(k.prixPassage))}</b> HTVA.</p>
+  <label for="k2_note">Note</label><textarea id="k2_note" data-f="note">${esc(k.note)}</textarea>
+  <div class="btns"><button class="btn" type="button" data-act="saveContrat">Enregistrer</button>${route.id!=="new"?`<button class="btn alt" type="button" data-act="passage" data-id="${k.id}">Planifier le prochain passage</button><button class="btn danger" type="button" data-act="delContrat">Supprimer</button>`:""}</div>`;
+}
+
+/* ---------- Sous-traitance (décomptes mensuels) ---------- */
+function vDecomptes(){
+  if(route.id)return fDecompte();
+  const list=[...S.decomptes].sort((a,b)=>(b.mois||"").localeCompare(a.mois||""));
+  return `<div class="row"><h1>Sous-traitance</h1><button class="btn" type="button" data-act="newDecompte">+ Jour</button></div>
+  <p class="small">Un décompte par donneur d'ordre et par mois, calculé à ${S.cfg.taux} €/h par homme, sauf tarif propre au donneur d'ordre ou au décompte.</p>
+  <div style="margin-top:12px">${list.length?list.map(dc=>{const t=decTotals(dc);return`<button class="card" type="button" data-open="decomptes:${dc.id}"><div class="row"><h3>${esc(cname(dc.clientId))}${tauxPill(dc)}</h3><span class="pill">${esc(new Date(dc.mois+"-15").toLocaleDateString("fr-BE",{month:"long",year:"numeric"}))}</span></div><div class="row small"><span>${(dc.jours||[]).length} jour(s) · ${hfmt(t.hh)} h</span><span class="num">${eur(t.montant)}</span></div></button>`}).join(""):`<div class="empty">Aucun décompte. Ajoutez votre premier jour de sous-traitance.</div>`}</div>`;
+}
+function fDecompte(){
+  let dc=draft;
+  if(!dc){
+    if(route.id==="new"){const st=S.clients.find(c=>c.type==="sous-traitance");dc={id:"",clientId:st?st.id:"",mois:month(),jours:[],payeJour:S.cfg.payeJour}}
+    else{const src=S.decomptes.find(x=>x.id===route.id);if(!src)return`<div class="empty">Décompte introuvable.</div>`;dc=JSON.parse(JSON.stringify(src))}
+    draft=dc;
+  }
+  const t=decTotals(dc);const stc=S.clients.filter(c=>c.type==="sous-traitance"||c.type==="entreprise");
+  return `<button class="back" type="button" data-tabgo="decomptes">‹ Sous-traitance</button><h1>Décompte</h1>
+  <div class="grid2"><div><label for="k_cli">Donneur d'ordre</label><select id="k_cli" data-f="clientId" ${route.id!=="new"?"disabled":""}><option value="">Choisir…</option>${stc.map(c=>`<option value="${c.id}" ${c.id===dc.clientId?"selected":""}>${esc(c.nom)}</option>`).join("")}</select></div>
+  <div><label for="k_mois">Mois</label><input id="k_mois" type="month" data-f="mois" value="${esc(dc.mois)}" ${route.id!=="new"?"disabled":""}></div></div>
+  <h2>Jours prestés</h2>
+  <div class="card">
+    ${(dc.jours||[]).map((j,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 64px 64px 36px"><div><input type="date" aria-label="Date" data-j="${i}" data-jf="d" value="${esc(j.d)}"><input aria-label="Note" placeholder="Note" data-j="${i}" data-jf="note" value="${esc(j.note)}" style="margin-top:4px"></div><input aria-label="Hommes" inputmode="numeric" data-j="${i}" data-jf="hommes" value="${esc(j.hommes)}"><input aria-label="Heures" inputmode="decimal" data-j="${i}" data-jf="h" value="${esc(j.h)}"><button class="x" type="button" data-delj="${i}" aria-label="Retirer le jour">×</button></div>`).join("")||'<p class="small">Aucun jour pour ce mois.</p>'}
+    <div class="small" style="display:grid;grid-template-columns:minmax(0,1fr) 64px 64px 36px;gap:6px;margin-top:4px"><span></span><span>hommes</span><span>heures</span><span></span></div>
+    <div class="btns"><button class="btn alt" type="button" data-act="addJour">+ Aujourd'hui</button></div>
+  </div>
+  <div class="card">
+    <label for="k_taux">Tarif horaire de ce décompte (€/h par homme)</label><input id="k_taux" inputmode="decimal" data-f="taux" value="${esc(dc.taux||"")}" placeholder="Vide = ${tauxFor({clientId:dc.clientId})} €/h${num(client(dc.clientId)?.taux)?" (tarif du donneur d'ordre)":""}">
+    <label for="k_paye">Ce que ce donneur d'ordre vous paie aujourd'hui (€ par jour de 8 h)</label><input id="k_paye" inputmode="decimal" data-f="payeJour" value="${esc(dc.payeJour)}">
+    <div class="tot"><span>Heures-homme</span><span class="num">${hfmt(t.hh)} h</span><span>À ${t.taux} €/h</span><span class="num big">${eur(t.montant)}</span><span>Au tarif payé aujourd'hui</span><span class="num">${eur(t.old)}</span><span>Écart</span><span class="num" style="font-weight:700;color:${t.gap>0?"var(--bad)":"var(--ok)"}">${eur(t.gap)}</span></div>
+  </div>
+  <div class="btns"><button class="btn" type="button" data-act="saveDecompte">Enregistrer</button><button class="btn alt" type="button" data-act="copyDecompte">Copier le décompte</button>${route.id!=="new"?`<button class="btn danger" type="button" data-act="delDecompte">Supprimer</button>`:""}</div>
+  <div id="copyOut"></div>`;
+}
+function decompteText(dc){
+  const t=decTotals(dc);const L=[`Décompte ${new Date(dc.mois+"-15").toLocaleDateString("fr-BE",{month:"long",year:"numeric"})} · ${cname(dc.clientId)}`,`Sous-traitant : ${ent()}`,""];
+  [...(dc.jours||[])].sort((a,b)=>(a.d||"").localeCompare(b.d||"")).forEach(j=>L.push(`${fdate(j.d)} : ${j.hommes} homme(s) × ${j.h} h = ${num(j.hommes)*num(j.h)} h${j.note?" ("+j.note+")":""}`));
+  L.push("",`Total : ${hfmt(t.hh)} heures-homme × ${eur(t.taux)} = ${eur(t.montant)} HTVA`,"Autoliquidation : TVA due par le cocontractant.");
+  return L.join("\n");
+}
+
+/* ---------- Réglages : mon entreprise, tarifs, listes, données ---------- */
+function vReglages(){
+  const c=draft||(draft=JSON.parse(JSON.stringify(S.cfg)));
+  const setup=route.sub==="setup";
+  c.couleurs=c.couleurs||[...DEFAULT_CFG.couleurs];
+  if(!c.jobs)c.jobs=JSON.parse(JSON.stringify(JOBS_DEF));
+  if(!c.machinesL)c.machinesL=JSON.parse(JSON.stringify(MACHINES_DEF));
+  c.fraisStd=c.fraisStd||[];c.decharges=c.decharges||[];c.ouvriers=c.ouvriers||[];c.catalogue=c.catalogue||[];
+  const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  const ident=`<h2>Mon entreprise</h2><div class="card">
+  <label for="s_ent">Nom de l'entreprise</label><input id="s_ent" data-f="entreprise" value="${esc(c.entreprise)}" placeholder="Ex. Jardins Dupont" autocomplete="organization">
+  <label for="s_slo">Petite phrase sous le nom (facultatif)</label><input id="s_slo" data-f="slogan" value="${esc(c.slogan)}" placeholder="Ex. Parcs et jardins">
+  <div class="grid2"><div><label for="s_pre">Votre prénom (signature des messages)</label><input id="s_pre" data-f="prenom" value="${esc(c.prenom)}" autocomplete="given-name"></div>
+  <div><label for="s_tel">Téléphone</label><input id="s_tel" type="tel" data-f="tel" value="${esc(c.tel)}" autocomplete="tel"></div></div>
+  <label for="s_mail">E-mail</label><input id="s_mail" type="email" data-f="email" value="${esc(c.email)}" autocomplete="email">
+  <label>Logo</label>
+  <div class="row" style="justify-content:flex-start;gap:12px">${c.logo?`<img src="${esc(c.logo)}" alt="Votre logo" style="width:64px;height:64px;border-radius:14px;border:1px solid var(--line);background:#fff;object-fit:contain">`:`<div class="icon" style="width:64px;height:64px;font-size:24px;border-radius:14px" aria-hidden="true">${esc(initiales(c.entreprise||"P"))}</div>`}
+  <div class="btns" style="margin:0"><label class="btn alt filebtn">🖼️ ${c.logo?"Changer":"Ajouter mon logo"}<input type="file" accept="image/*" data-logo="" aria-label="Choisir votre logo"></label>${c.logo?`<button class="btn alt" type="button" data-act="logoDel">Retirer</button>`:""}</div></div>
+  <p class="small" style="margin-top:6px">Il apparaît en haut de l'app et sert d'icône sur l'écran d'accueil.</p>
+  <label>Couleurs</label>
+  <div class="presets">${PRESETS.map(([n,p],i)=>`<button type="button" class="preset ${same(p,c.couleurs)?"on":""}" data-act="preset" data-i="${i}" aria-pressed="${same(p,c.couleurs)}"><span class="swatch" style="--a:${p[0]};--b:${p[1]};--c:${p[2]}"></span>${esc(n)}</button>`).join("")}</div>
+  <p class="small" style="margin-top:8px">Ou vos propres couleurs (de gauche à droite) :</p>
+  <div class="swatch" id="swPrev" style="--a:${esc(c.couleurs[0])};--b:${esc(c.couleurs[1])};--c:${esc(c.couleurs[2])};margin:6px 0"></div>
+  <div class="grid2" style="grid-template-columns:repeat(3,minmax(0,1fr))">${[0,1,2].map(i=>`<div><label for="s_col${i}">Couleur ${i+1}</label><input id="s_col${i}" type="color" data-col="${i}" value="${esc(c.couleurs[i])}"></div>`).join("")}</div>
+  </div>
+  <h2>Pays et tarifs</h2><div class="card">
+  <div class="grid2"><div><label for="s_pays">Pays</label><select id="s_pays" data-f="pays">${Object.entries(PAYS).map(([k,p])=>`<option value="${k}" ${c.pays===k?"selected":""}>${p.n}</option>`).join("")}</select></div>
+  <div><label for="r_taux">Tarif horaire (€ HTVA par homme)</label><input id="r_taux" inputmode="decimal" data-f="taux" value="${esc(c.taux)}"></div></div>
+  <label for="s_tvas">Taux de TVA proposés (%)</label><input id="s_tvas" data-f="tvasTxt" value="${esc((c.tvas||[]).join(" ; ").replace(/\./g,","))}">
+  <label for="s_tvan">N° TVA ou d'entreprise</label><input id="s_tvan" data-f="tvaNum" value="${esc(c.tvaNum)}">
+  </div>`;
+  if(setup)return `<h1>Créer mon app</h1><p class="muted">Deux minutes. Tout se change plus tard dans Réglages.</p>${ident}
+  <label class="opt" style="margin-top:14px;font-size:14px;color:var(--fg)"><input type="checkbox" id="s_demo"> Ajouter quelques exemples pour essayer (clients et chantiers fictifs)</label>
+  <div class="btns" style="margin-top:16px"><button class="btn full" type="button" data-act="saveCfg">Créer mon app</button></div>`;
+  return `<button class="back" type="button" data-tabgo="accueil">‹ Accueil</button><div class="row"><h1>Réglages</h1><button class="btn" type="button" data-act="saveCfg">Enregistrer</button></div>
+  ${ident}
+  <h2>Ma façon de travailler</h2><div class="card">
+  <label class="opt" style="font-size:14px;color:var(--fg)"><input type="checkbox" data-f="sousTraitance" ${c.sousTraitance?"checked":""}> Je travaille aussi en sous-traitance pour d'autres entreprises (onglet « Sous-trait. »)</label>
+  <label class="opt" style="font-size:14px;color:var(--fg);margin-top:8px"><input type="checkbox" data-f="notesFrais" ${c.notesFrais?"checked":""}> Je déclare mes achats en notes de frais</label>
+  <label for="s_out">Où je fais mes factures (facultatif)</label><input id="s_out" data-f="outil" value="${esc(c.outil)}" placeholder="Ex. mon logiciel de facturation, mon comptable">
+  <label for="s_avis">Lien vers ma fiche Google pour les avis (facultatif)</label><input id="s_avis" data-f="avisLien" value="${esc(c.avisLien)}" placeholder="https://g.page/r/…">
+  <label for="r_cond">Conditions de paiement (en bas des devis et décomptes)</label><textarea id="r_cond" data-f="conditions">${esc(c.conditions||"")}</textarea>
+  <label for="r_dep">Dépôt (point de départ)</label><input id="r_dep" data-f="depot" value="${esc(c.depot)}" placeholder="Adresse de votre dépôt ou de votre domicile">
+  </div>
+  <h2>Calculs</h2><div class="card"><div class="grid2">
+  <div><label for="r_km">Coût d'un km avec remorque (€)</label><input id="r_km" inputmode="decimal" data-f="kmCost" value="${esc(c.kmCost)}"></div>
+  <div><label for="r_marge">Marge sur les frais (%)</label><input id="r_marge" inputmode="decimal" data-f="margePct" value="${esc(Math.round(c.marge*100))}"></div>
+  <div><label for="r_ma">Majoration des achats refacturés (%)</label><input id="r_ma" inputmode="decimal" data-f="margeAchats" value="${esc(c.margeAchats||0)}"></div>
+  ${c.sousTraitance?`<div><label for="r_paye">Ce qu'on me paie en sous-traitance (€/jour)</label><input id="r_paye" inputmode="decimal" data-f="payeJour" value="${esc(c.payeJour)}"></div>`:""}</div></div>
+  <h2>Frais mis d'office sur chaque chantier</h2><div class="card">
+  ${c.fraisStd.map((f,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 90px 36px"><input aria-label="Libellé" data-rl="fraisStd" data-i="${i}" data-k="n" value="${esc(f.n)}"><input aria-label="Prix HTVA" inputmode="decimal" data-rl="fraisStd" data-i="${i}" data-k="p" data-num="1" value="${esc(f.p)}"><button class="x" type="button" data-act="delRow" data-rl="fraisStd" data-i="${i}" aria-label="Retirer">×</button></div>`).join("")||'<p class="small">Aucun frais automatique.</p>'}
+  <div class="btns"><button class="btn alt" type="button" data-act="addRow" data-rl="fraisStd">+ Frais</button></div></div>
+  <h2>Ouvriers et frais (pour calculer mon bénéfice)</h2>
+  <div class="card">
+  <label for="r_to">Taux payé à un ouvrier, par défaut (€/h)</label><input id="r_to" inputmode="decimal" data-f="tauxOuvrier" value="${esc(c.tauxOuvrier??0)}">
+  ${c.ouvriers.length?`<div class="small" style="display:grid;grid-template-columns:minmax(0,1fr) 110px 70px 36px;gap:6px;margin-top:10px"><span>Nom</span><span>Téléphone</span><span>€/h</span><span></span></div>`:""}
+  ${c.ouvriers.map((o,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 110px 70px 36px"><input aria-label="Nom de l'ouvrier" data-ouv-i="${i}" data-ouv-f="nom" value="${esc(o.nom)}"><input aria-label="Téléphone" type="tel" data-ouv-i="${i}" data-ouv-f="tel" value="${esc(o.tel||"")}"><input aria-label="Taux €/h" inputmode="decimal" data-ouv-i="${i}" data-ouv-f="taux" value="${esc(o.taux)}"><button class="x" type="button" data-delouv="${i}" aria-label="Retirer">×</button></div>`).join("")}
+  <div class="btns"><button class="btn alt" type="button" data-act="addOuv">+ Ouvrier</button></div>
+  <div class="grid2"><div><label for="r_cc">Camionnette : assurance, entretien, usure (€/jour)</label><input id="r_cc" inputmode="decimal" data-f="coutCamion" value="${esc(c.coutCamion??15)}"></div>
+  <div><label for="r_cb">Carburant camionnette estimé (€/jour)</label><input id="r_cb" inputmode="decimal" data-f="carbCamion" value="${esc(c.carbCamion??12)}"></div>
+  <div><label for="r_cr">Remorque (€/jour utilisée)</label><input id="r_cr" inputmode="decimal" data-f="coutRemorque" value="${esc(c.coutRemorque??5)}"></div>
+  <div><label for="r_em">Essence machines estimée (€/jour)</label><input id="r_em" inputmode="decimal" data-f="essMachines" value="${esc(c.essMachines??6)}"></div></div>
+  </div>
+  <h2>Mes prestations et prix (${c.catalogue.length})</h2>
+  <p class="small">Prix d'exemple au départ : mettez les vôtres. Ils servent à faire les devis en deux touches.</p>
+  <div class="card"><div class="small" style="display:grid;grid-template-columns:minmax(0,1fr) 70px 80px 36px;gap:6px"><span>Prestation</span><span>Unité</span><span>€ HTVA</span><span></span></div>${c.catalogue.map((x,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 70px 80px 36px"><input aria-label="Prestation" data-cat-i="${i}" data-cat-f="n" value="${esc(x.n)}"><input aria-label="Unité" data-cat-i="${i}" data-cat-f="u" value="${esc(x.u)}"><input aria-label="Prix" inputmode="decimal" data-cat-i="${i}" data-cat-f="p" value="${esc(x.p)}"><button class="x" type="button" data-act="delCat" data-i="${i}" aria-label="Retirer">×</button></div>`).join("")}
+  <div class="btns"><button class="btn alt" type="button" data-act="addCat">+ Prestation</button></div></div>
+  <h2>Types de travail et étapes</h2>
+  <p class="small">Une étape par ligne. Elles s'affichent comme liste à cocher sur chaque chantier.</p>
+  ${c.jobs.map((j,i)=>`<div class="card"><div class="row"><input aria-label="Type de travail" data-rl="jobs" data-i="${i}" data-k="n" value="${esc(j.n)}" style="font-weight:600"><button class="x btn alt" type="button" data-act="delRow" data-rl="jobs" data-i="${i}" aria-label="Retirer ce type" style="flex:none;min-width:44px">×</button></div><textarea aria-label="Étapes de ${esc(j.n)}" data-rl="jobs" data-i="${i}" data-k="steps" data-lines="1" style="margin-top:6px">${esc((j.steps||[]).join("\n"))}</textarea></div>`).join("")}
+  <div class="btns" style="margin-top:0"><button class="btn alt" type="button" data-act="addRow" data-rl="jobs">+ Type de travail</button></div>
+  <h2>Mes machines et mon matériel</h2>
+  <p class="small">Une machine par ligne. Mettez vos vrais modèles (ex. « Tondeuse Honda 53 cm »).</p>
+  ${c.machinesL.map((m,i)=>`<details class="card"><summary style="cursor:pointer;font-weight:600">${esc(m.c)} <span class="small">(${(m.l||[]).length})</span></summary><label for="mc${i}">Catégorie</label><div class="row"><input id="mc${i}" data-rl="machinesL" data-i="${i}" data-k="c" value="${esc(m.c)}"><button class="x btn alt" type="button" data-act="delRow" data-rl="machinesL" data-i="${i}" aria-label="Retirer cette catégorie" style="flex:none;min-width:44px">×</button></div><textarea aria-label="Machines : ${esc(m.c)}" data-rl="machinesL" data-i="${i}" data-k="l" data-lines="1" style="margin-top:6px;min-height:140px">${esc((m.l||[]).join("\n"))}</textarea></details>`).join("")}
+  <div class="btns" style="margin-top:0"><button class="btn alt" type="button" data-act="addRow" data-rl="machinesL">+ Catégorie</button></div>
+  <h2>Décharges pour les déchets verts</h2>
+  <div class="card">${c.decharges.length?`<div class="small" style="display:grid;grid-template-columns:minmax(0,1fr) 52px 60px 60px 36px;gap:6px"><span>Nom</span><span>km</span><span>€/t</span><span>min. €</span><span></span></div>`:'<p class="small">Ajoutez la décharge où vous videz la remorque : le devis calcule alors le coût réel (poids, km, temps).</p>'}
+  ${c.decharges.map((s,i)=>`<div class="line" style="grid-template-columns:minmax(0,1fr) 52px 60px 60px 36px"><input aria-label="Nom de la décharge" data-dec-i="${i}" data-dec-f="n" value="${esc(s.n)}"><input aria-label="Distance en km" inputmode="decimal" data-dec-i="${i}" data-dec-f="km" value="${esc(s.km)}"><input aria-label="Prix par tonne" inputmode="decimal" data-dec-i="${i}" data-dec-f="t" value="${esc(s.t)}"><input aria-label="Minimum par passage" inputmode="decimal" data-dec-i="${i}" data-dec-f="min" value="${esc(s.min||0)}"><button class="x" type="button" data-act="delDech" data-i="${i}" aria-label="Retirer">×</button></div>`).join("")}
+  <div class="btns"><button class="btn alt" type="button" data-act="addDech">+ Décharge</button></div></div>
+  <div class="btns"><button class="btn full" type="button" data-act="saveCfg">Enregistrer les réglages</button></div>
+  <h2>Mon équipe</h2>
+  <div class="card"><p class="small">Vos ouvriers installent la même app et choisissent « Je suis ouvrier ». Sur chaque chantier, le bouton « Envoyer ce chantier à un ouvrier » leur envoie par WhatsApp l'adresse, le matériel, les étapes et vos consignes, sans aucun prix. Le soir, ils vous renvoient leur rapport de la même façon et vous l'ajoutez au chantier en une touche.</p>
+  <p class="small">${S.rapports.length} rapport(s) reçu(s).</p>
+  <div class="btns"><button class="btn alt" type="button" data-tabgo="rapports">Voir les rapports</button><button class="btn alt" type="button" data-act="apercu">👀 Voir comme un ouvrier</button></div></div>
+  <h2>Mes données</h2>
+  <div class="card"><p class="small">Tout est enregistré sur cet appareil uniquement. Faites une sauvegarde de temps en temps (et avant de changer de téléphone) : gardez le fichier dans Fichiers, iCloud ou Google Drive.${S.cfg.derniereSauvegarde?" Dernière sauvegarde : "+fdate(S.cfg.derniereSauvegarde)+".":" Aucune sauvegarde pour l'instant."}</p>
+  <div class="btns"><button class="btn" type="button" data-act="backup">💾 Sauvegarder mes données</button></div>
+  <p class="small" style="margin-top:12px">Restaurer une sauvegarde :</p>${restoreUI()}
+  <p class="small" style="margin-top:12px">Exports pour le comptable (fichiers CSV pour Excel ou Numbers) :</p>
+  <div class="btns" style="margin-top:6px"><button class="btn alt" type="button" data-exp="devis">Devis</button>${c.sousTraitance?`<button class="btn alt" type="button" data-exp="decomptes">Sous-traitance</button>`:""}<button class="btn alt" type="button" data-exp="frais">Frais</button><button class="btn alt" type="button" data-exp="heures">Heures</button></div>
+  <div class="btns" style="margin-top:18px"><button class="btn alt" type="button" data-act="demo">Ajouter des exemples</button><button class="btn danger" type="button" data-act="wipe">Tout effacer</button></div></div>`;
+}
+
+/* ---------- saisie ---------- */
+const main=document.getElementById("main");
+main.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.id==="qClient"){route.sub=el.value;const pos=el.selectionStart;render();const n=document.getElementById("qClient");n.focus();n.setSelectionRange(pos,pos);return}
+  if(!draft)return;
+  if(el.dataset.nc){draft._nc[el.dataset.nc]=el.value;if(el.dataset.nc==="adresse")upMap(el);return}
+  if(el.dataset.f==="adresse")upMap(el);
+  if(el.dataset.f==="pays"){const p=PAYS[el.value];draft.pays=el.value;if(p){draft.tvas=[...p.tvas];draft.indicatif=p.ind}rerender();return}
+  if(el.dataset.f==="tvasTxt"){draft.tvas=el.value.split(/[;\s]+/).map(x=>num(x)).filter((x,i,a)=>x>=0&&a.indexOf(x)===i&&x!==null&&String(x)!=="NaN");return}
+  if(el.dataset.col!==undefined){draft.couleurs=[...(draft.couleurs||DEFAULT_CFG.couleurs)];draft.couleurs[+el.dataset.col]=el.value;applyBrand(draft);const sw=document.getElementById("swPrev");if(sw)sw.style.cssText=`--a:${draft.couleurs[0]};--b:${draft.couleurs[1]};--c:${draft.couleurs[2]}`;return}
+  if(el.dataset.rl){const arr=draft[el.dataset.rl];const row=arr[+el.dataset.i];const k=el.dataset.k;row[k]=el.dataset.lines?el.value.split("\n").map(s=>s.trim()).filter(Boolean):(el.dataset.num?num(el.value):el.value);if(route.sub!=="setup"&&(el.dataset.rl==="jobs"||el.dataset.rl==="machinesL")&&k!=="steps"&&k!=="l"){}return}
+  if(el.dataset.f==="clientId"&&route.tab==="chantiers"&&el.value!=="__new"){const old=client(draft.clientId)?.adresse||"";if(!draft.adresse||draft.adresse===old)draft.adresse=client(el.value)?.adresse||""}
+  if(el.dataset.f==="clientId"&&el.value==="__new"){draft._nc={nom:"",tel:"",email:"",adresse:"",type:"particulier"};draft.clientId="";rerender();setTimeout(()=>document.getElementById("nc_nom")?.focus(),50);return}
+  if(el.dataset.f==="clientId"&&draft._nc)delete draft._nc;
+  if(el.dataset.f){let v=el.type==="checkbox"?el.checked:el.value;if(["tva","payeJour","taux","margeAchats","kmCost","tauxOuvrier","coutCamion","carbCamion","coutRemorque","essMachines","freqSem","moisDebut","moisFin","prixPassage"].includes(el.dataset.f))v=num(v);if(route.tab==="reglages"&&["entreprise","slogan"].includes(el.dataset.f)){draft[el.dataset.f]=v;applyBrand(draft);return}if(route.tab==="reglages"&&["sousTraitance","notesFrais"].includes(el.dataset.f)){draft[el.dataset.f]=v;rerender();return}if(el.dataset.f==="margePct"){draft.marge=num(v)/100;return}draft[el.dataset.f]=v;if(el.dataset.f==="statut"&&v==="envoyé"&&route.tab==="devis"&&!draft.sentAt)draft.sentAt=today();if(el.dataset.f==="statut"&&route.tab==="chantiers"){if(v==="décompte envoyé"&&!draft.envoyeLe)draft.envoyeLe=today();if(v==="payé"&&!draft.payeLe)draft.payeLe=today()}
+    if(route.tab==="contrats"&&["freqSem","moisDebut","moisFin","prixPassage"].includes(el.dataset.f)){softTotals();return}
+    if(route.tab==="devis"&&["heuresEst","acompte"].includes(el.dataset.f)){softTotals();return}
+    if(["tva","statut","clientId"].includes(el.dataset.f)&&route.tab!=="clients"){if(el.dataset.f==="clientId"&&route.tab==="devis"){draft.tva=num(client(v)?.tva??draft.tva)}rerender()}else if(route.tab==="decomptes"&&["payeJour","taux"].includes(el.dataset.f))softTotals();return}
+  if(el.dataset.l!==undefined){const l=draft.lignes[+el.dataset.l];if(el.dataset.lf==="opt"){l.opt=el.checked;rerender();return}l[el.dataset.lf]=el.dataset.lf==="n"?el.value:el.value.replace(",",".");softTotals();return}
+  if(el.dataset.a){const row=draft[el.dataset.a][+el.dataset.i];row[el.dataset.k]=el.type==="checkbox"?el.checked:(["d","cat","lib","n"].includes(el.dataset.k)?el.value:el.value.replace(",","."));if(el.tagName==="SELECT"||el.type==="checkbox"){rerender();return}softTotals();return}
+  if(el.dataset.ev){draft.evac[el.dataset.ev]=el.dataset.ev==="on"?el.checked:el.dataset.ev==="site"?el.value:el.value.replace(",",".");
+    if(el.dataset.ev==="site"){const s=S.cfg.decharges.find(x=>x.id===el.value);if(s){draft.evac.km=s.km*2;draft.evac.h=+((s.km*2/30)+0.75).toFixed(2)}}
+    if(el.dataset.ev==="on"||el.dataset.ev==="site")rerender();else softTotals();return}
+  if(el.dataset.j!==undefined){draft.jours[+el.dataset.j][el.dataset.jf]=el.value;softTotals();return}
+  if(el.dataset.ouvI!==undefined){draft.ouvriers[+el.dataset.ouvI][el.dataset.ouvF]=el.dataset.ouvF==="taux"?num(el.value):el.value}
+  if(el.dataset.decI!==undefined){draft.decharges[+el.dataset.decI][el.dataset.decF]=el.dataset.decF==="n"?el.value:num(el.value)}
+  if(el.dataset.catI!==undefined){draft.catalogue[+el.dataset.catI][el.dataset.catF]=el.dataset.catF==="p"?num(el.value):el.value}
+});
+function rerender(){const m=document.getElementById("main");const y=window.scrollY;m.dataset.form="";const banner=online?"":m.querySelector(".banner")?.outerHTML||"";m.innerHTML=banner+apercuBar()+(VIEWS[route.tab]||vAccueil)();m.dataset.form=route.tab+":"+(route.id||"");window.scrollTo(0,y)}
+let softT;function softTotals(){clearTimeout(softT);softT=setTimeout(()=>{const a=document.activeElement;const key=a&&(a.dataset.l!==undefined?`[data-l="${a.dataset.l}"][data-lf="${a.dataset.lf}"]`:a.dataset.j!==undefined?`[data-j="${a.dataset.j}"][data-jf="${a.dataset.jf}"]`:a.dataset.a?`[data-a="${a.dataset.a}"][data-i="${a.dataset.i}"][data-k="${a.dataset.k}"]`:a.dataset.ev?`[data-ev="${a.dataset.ev}"]`:a.id?"#"+a.id:null);const pos=a&&a.selectionStart;rerender();if(key){const n=document.querySelector(key);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}}},500)}
+
+function shrink(file,max,q){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height));const cv=document.createElement("canvas");cv.width=Math.round(img.width*k);cv.height=Math.round(img.height*k);cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(u);cv.toBlob(b=>b?res(b):rej(new Error("conversion")),"image/jpeg",q)};img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("image illisible"))};img.src=u})}
+function logoData(file){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const S2=256;const cv=document.createElement("canvas");cv.width=cv.height=S2;const x=cv.getContext("2d");x.fillStyle="#ffffff";x.fillRect(0,0,S2,S2);const k=Math.min(S2/img.width,S2/img.height)*0.9;const w=img.width*k,h=img.height*k;x.drawImage(img,(S2-w)/2,(S2-h)/2,w,h);URL.revokeObjectURL(u);res(cv.toDataURL("image/png"))};img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("image"))};img.src=u})}
+function blobToData(b){return new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)})}
+main.addEventListener("change",async e=>{
+  const el=e.target;
+  if(el.dataset.logo!==undefined&&draft){const f=el.files&&el.files[0];el.value="";if(!f)return;try{draft.logo=await logoData(f);applyBrand(draft);rerender();toast("Logo ajouté : enregistrez les réglages.")}catch(err){toast("Image illisible : essayez une autre (PNG ou JPEG).")}return}
+  if(el.dataset.restore!==undefined){const f=el.files&&el.files[0];el.value="";if(f)await restoreBackup(f);return}
+  if(el.dataset.photo===undefined||!draft)return;
+  const files=[...el.files];el.value="";if(!files.length)return;
+  draft.photos=draft.photos||[];toast(files.length>1?files.length+" photos en cours d'envoi…":"Photo en cours d'envoi…");
+  let ok=0;
+  for(const f of files){try{
+    const b=IDB?await shrink(f,1600,0.72):await shrink(f,900,0.6);const pid=await savePhoto(await blobToData(b));draft.photos.push({pid,d:today(),tag:el.dataset.photo})
+    ok++}catch(err){toast("Photo refusée ("+(err&&(err.code||err.message)||"erreur")+").")}}
+  if(!ok)return;
+  if(role==="ouvrier"){rerender();toast(ok>1?ok+" photos ajoutées.":"Photo ajoutée.");return}
+  (draft.checklist||[]).forEach(x=>{if(x.t.toLowerCase()==="photo "+el.dataset.photo)x.done=true});
+  if(route.id!=="new"){if(await save("chantiers",draft,ok>1?ok+" photos ajoutées.":"Photo ajoutée."))rerender()}else{rerender();toast("Photo ajoutée : enregistrez le chantier.")}
+});
+main.addEventListener("toggle",e=>{const d=e.target;if(d.dataset&&d.dataset.sec)openSec[d.dataset.sec]=d.open},true);
+main.addEventListener("click",async e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.open){const[t,id]=b.dataset.open.split(":");go(t,id);return}
+  if(b.dataset.tabgo){go(b.dataset.tabgo);return}
+  if(b.dataset.delph!==undefined){const i=+b.dataset.delph;const ph=draft.photos[i];if(!ph||!confirm("Supprimer cette photo ?"))return;
+    if(ph.pid&&!S.chantiers.some(c=>c.id!==draft.id&&(c.photos||[]).some(x=>x.pid===ph.pid)))await delPhoto(ph.pid);
+    draft.photos.splice(i,1);if(route.id!=="new"){if(await save("chantiers",draft,"Photo supprimée."))rerender()}else rerender();return}
+  if(b.dataset.mode){draft.mode=b.dataset.mode;(draft.frais||[]).forEach(f=>{if(draft.mode==="devis")f.refact=false});rerender();return}
+  if(b.dataset.addl!==undefined){const x=S.cfg.catalogue[+b.dataset.addl];if(x){draft.lignes.push({n:x.n,q:1,p:x.p});rerender()}return}
+  if(b.dataset.job){draft.type=b.dataset.job;draft.kit=[...((S.cfg.kits||{})[b.dataset.job]||[])];if(!draft.titre)draft.titre=b.dataset.job;if(!(draft.checklist||[]).some(x=>x.done))draft.checklist=stepsFor(b.dataset.job).map(t=>({t,done:false}));rerender();return}
+  if(b.dataset.ktype){draft.type=b.dataset.ktype;rerender();return}
+  if(b.dataset.chk){const x=draft.checklist[+b.dataset.chk];x.done=!x.done;rerender();return}
+  if(b.dataset.adel){draft[b.dataset.adel].splice(+b.dataset.i,1);rerender();return}
+  if(b.dataset.msg){copyOut(messageText(b.dataset.msg,draft),"Message à envoyer par SMS, WhatsApp ou e-mail");return}
+  if(b.dataset.exp){exportCsv(b.dataset.exp);return}
+  if(b.dataset.kit){const k=b.dataset.kit;draft.kit=draft.kit.includes(k)?draft.kit.filter(x=>x!==k):[...draft.kit,k];rerender();return}
+  if(b.dataset.cat){const c=S.cfg.catalogue[+b.dataset.cat];draft.lignes.push({n:c.n,u:c.u,q:1,p:c.p});rerender();toast("Ajouté : "+c.n);return}
+  if(b.dataset.delouv!==undefined){draft.ouvriers.splice(+b.dataset.delouv,1);rerender();return}
+  if(b.dataset.dell){draft.lignes.splice(+b.dataset.dell,1);rerender();return}
+  if(b.dataset.delj){draft.jours.splice(+b.dataset.delj,1);rerender();return}
+  const a=b.dataset.act;if(!a)return;
+  const confirmDel=async(col,label)=>{if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Confirmer : "+label;return false}try{await store.remove(col,route.id);toast("Supprimé.");go(col);}catch(err){toast("Suppression refusée.")}return true};
+  switch(a){
+    case"newClient":go("clients","new");break;
+    case"newChantier":go("chantiers","new");break;
+    case"newDevis":go("devis","new");break;
+    case"newDecompte":go("decomptes","new");break;
+    case"newDevisFor":go("devis","new",route.id);break;
+    case"devisFromChantier":go("devis","new",route.id);break;
+    case"saveClient":if(!draft.nom.trim()){toast("Indiquez le nom du client.");break}draft.tva=num(draft.tva);if(await save("clients",draft,"Client enregistré."))go("clients");break;
+    case"delClient":{const n=["chantiers","devis","contrats","decomptes"].reduce((s,k)=>s+S[k].filter(x=>x.clientId===route.id).length,0);if(n){toast("Ce client a encore "+n+" élément(s) (chantiers, devis…). Supprimez-les d'abord.");break}await confirmDel("clients","supprimer ce client");break}
+    case"kitAll":kitAll=!kitAll;rerender();break;
+    case"kitAdd":{const i=document.getElementById("h_kitnew");const k=(i?.value||"").trim();if(!k)break;if(!draft.kit.includes(k))draft.kit.push(k);
+      const ex=S.cfg.kitsExtra||[];if(!Object.values(machinesObj()).flat().includes(k)&&!ex.includes(k)){S.cfg.kitsExtra=[...ex,k];try{await store.saveCfg({...S.cfg})}catch(err){}}rerender();break}
+    case"kitMemo":{const kits={...(S.cfg.kits||{}),[draft.type]:[...draft.kit]};try{await store.saveCfg({...S.cfg,kits});toast("Ce matériel sera proposé pour chaque chantier « "+draft.type+" ».")}catch(err){toast("Pas enregistré.")}rerender();break}
+    case"shareMission":{const c=draft;if(route.id==="new"){toast("Enregistrez d'abord le chantier.");break}const m={v:1,id:c.id,...missionDoc(c),b:brandMini()};
+      const lines=[`Chantier : ${m.titre}`,m.date?`Date : ${fdate(m.date)}`:"",`Client : ${m.client}`,m.adresse?`Adresse : ${m.adresse}`:"",m.adresse?mapsUrl(m.adresse):"",m.consignes?`Consignes : ${m.consignes}`:"",m.kit.length?`Matériel : ${m.kit.join(", ")}`:"",m.checklist.length?`À faire : ${m.checklist.join(" · ")}`:"","",`Pour l'ajouter dans ton app ${ent()} : ${APP_URL}#m=${enc64(m)}`,"(ou ouvre l'app, Chantiers, « Coller un message », et colle ce message)"].filter((x,i,a)=>x!==""||a[i-1]!=="");
+      const out=document.getElementById("copyOut");if(out){out.innerHTML=shareBox(lines.join("\n"),b.dataset.tel,"Chantier à envoyer à l'ouvrier");out.scrollIntoView({behavior:"smooth",block:"center"})}break}
+    case"copyTxt":{const ta=b.closest(".card")?.querySelector("textarea");if(!ta)break;try{navigator.clipboard.writeText(ta.value).then(()=>toast("Message copié."),()=>{ta.focus();ta.select();toast("Sélectionné : copiez-le à la main.")})}catch(err){ta.focus();ta.select()}break}
+    case"importColle":{const ta=document.getElementById("pasteIn");const c=codeFromText(ta&&ta.value);if(!c){toast("Aucun chantier ni rapport trouvé dans ce texte.");break}await importCode(c.kind,c.code);break}
+    case"setupPatron":route={tab:"reglages",id:null,sub:"setup"};draft=JSON.parse(JSON.stringify({...S.cfg,setup:false}));render();window.scrollTo(0,0);break;
+    case"setupOuvrier":route={tab:"bienvenue",id:null,sub:"ouvrier"};draft=null;render();break;
+    case"finOuvrier":{const n=(document.getElementById("w_nom")?.value||"").trim();if(!n){toast("Indiquez votre prénom.");break}try{localStorage.setItem("paysapro-ouvrier-nom",n)}catch(err){}await store.saveCfg({...S.cfg,setup:true,role:"ouvrier",prenom:n});setOuvrier();go("missions");break}
+    case"logoDel":draft.logo="";applyBrand(draft);rerender();break;
+    case"preset":{const p=PRESETS[+b.dataset.i];if(p){draft.couleurs=[...p[1]];applyBrand(draft);rerender()}break}
+    case"addRow":{const k=b.dataset.rl;draft[k]=draft[k]||[];draft[k].push(k==="fraisStd"?{n:"",p:0}:k==="jobs"?{n:"Nouveau type",steps:["Photo avant","Photo après"]}:k==="machinesL"?{c:"Nouvelle catégorie",l:[]}:{});rerender();break}
+    case"delRow":{draft[b.dataset.rl].splice(+b.dataset.i,1);rerender();break}
+    case"addDech":draft.decharges=draft.decharges||[];draft.decharges.push({id:uid(),n:"",km:10,t:0,min:0,f:0});rerender();break;
+    case"delDech":draft.decharges.splice(+b.dataset.i,1);rerender();break;
+    case"delCat":draft.catalogue.splice(+b.dataset.i,1);rerender();break;
+    case"backup":await saveBackup();break;
+    case"wipe":{if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Confirmer : tout effacer sur cet appareil";break}await wipeAll();break}
+    case"demo":await addDemo();break;
+    case"doRestore":await doRestore();break;
+    case"cancelRestore":confirmRestore=null;rerender();break;
+    case"bienvenueRetour":route={tab:"bienvenue",id:null,sub:null};render();break;
+    case"adrClient":draft.adresse=client(draft.clientId)?.adresse||"";rerender();break;
+    case"saveChantier":if(!await ensureNewClient())break;if(draft.adresse&&FAUSSE_ADR.test(draft.adresse))draft.adresse=client(draft.clientId)?.adresse||"";if(!draft.clientId){toast("Choisissez le client.");break}if(!draft.type){toast("Choisissez le type de travail.");break}if(await save("chantiers",draft,"Chantier enregistré."))go("chantiers");break;
+    case"delChantier":await confirmDel("chantiers","supprimer ce chantier");break;
+    case"addLine":draft.lignes.push({n:"",u:"forfait",q:1,p:0});rerender();break;
+    case"saveDevis":if(!await ensureNewClient())break;if(!draft.clientId){toast("Choisissez le client.");break}draft.tva=num(draft.tva);if(await save("devis",draft,"Devis "+draft.numero+" enregistré.")){route.id=draft.id;rerender()}break;
+    case"delDevis":await confirmDel("devis","supprimer ce devis");break;
+    case"copyDevis":copyOut(devisText(draft));break;
+    case"addJour":draft.jours.push({d:today(),hommes:1,h:8,note:""});rerender();break;
+    case"saveDecompte":{if(!draft.clientId){toast("Choisissez le donneur d'ordre.");break}
+      const id=draft.id||(draft.clientId+"_"+draft.mois);const ex=S.decomptes.find(x=>x.id===id);
+      if(route.id==="new"&&ex){draft.jours=[...(ex.jours||[]),...draft.jours]}
+      draft.id=id;if(await save("decomptes",draft,"Décompte enregistré.")){route.id=id;rerender()}break}
+    case"delDecompte":await confirmDel("decomptes","supprimer ce décompte");break;
+    case"copyDecompte":copyOut(decompteText(draft));break;
+    case"addHeure":draft.heures.push({d:today(),hommes:1,h:8});rerender();break;
+    case"addFrais":draft.frais.push({d:today(),cat:"Matériaux",lib:"",montant:"",smart:false,refact:draft.mode!=="devis"});rerender();break;
+    case"fraisStd":draft.lignes=[...draft.lignes,...fraisDefaut()];rerender();break;
+    case"addLigneR":draft.lignes.push({n:"",q:1,p:""});rerender();break;
+    case"copyRegie":copyOut(regieText(draft,true),"Décompte à envoyer par e-mail, SMS ou WhatsApp");break;
+    case"copyRegieSmart":copyOut(regieText(draft,false),"Texte à coller dans "+outil());break;
+    case"rapAjout":case"rapLu":{const r=S.rapports.find(x=>x.id===route.id);if(r)await rapportAjout(r,a==="rapLu");break}
+    case"apercu":apercu=true;setOuvrier();render();window.scrollTo(0,0);break;
+    case"markTermine":draft.statut="terminé";if(await save("chantiers",draft,"Chantier terminé : décompte prêt."))rerender();break;
+    case"markEnvoye":draft.statut="décompte envoyé";draft.envoyeLe=today();if(await save("chantiers",draft,"Décompte marqué envoyé."))rerender();break;
+    case"markPaye":draft.statut="payé";draft.payeLe=today();if(await save("chantiers",draft,"Paiement noté."))rerender();break;
+    case"dupDevis":{const c=JSON.parse(JSON.stringify(draft));c.id=uid();c.numero=nextNumero();c.date=today();c.statut="brouillon";delete c.sentAt;route={tab:"devis",id:"new",sub:null};draft=c;rerender();toast("Copie créée : pensez à enregistrer.");break}
+    case"toDecompte":{const c=draft;if(!(c.heures||[]).length){toast("Aucune heure pointée sur ce chantier.");break}
+      const byM={};c.heures.forEach(h=>{const m=(h.d||today()).slice(0,7);(byM[m]=byM[m]||[]).push({d:h.d||today(),hommes:num(h.hommes)||1,h:num(h.h),note:c.titre||c.type||""})});
+      let okAll=true;for(const m of Object.keys(byM)){const id=c.clientId+"_"+m;const ex=S.decomptes.find(x=>x.id===id);const dc=ex?JSON.parse(JSON.stringify(ex)):{id,clientId:c.clientId,mois:m,jours:[],payeJour:S.cfg.payeJour};
+        const nouveaux=byM[m].filter(j=>!(dc.jours||[]).some(x=>x.d===j.d&&num(x.h)===j.h&&num(x.hommes)===j.hommes));dc.jours=[...(dc.jours||[]),...nouveaux];if(!await save("decomptes",dc)){okAll=false;break}}
+      if(!okAll)break;c.statut="payé"===c.statut?c.statut:"décompte envoyé";c.envoyeLe=c.envoyeLe||today();c.decompteST=true;
+      if(await save("chantiers",c,"Heures ajoutées au décompte de sous-traitance.")){const m=Object.keys(byM).sort().pop();go("decomptes",c.clientId+"_"+m)}break}
+    case"newContrat":go("contrats","new");break;
+    case"saveContrat":if(!await ensureNewClient())break;if(!draft.clientId){toast("Choisissez le client.");break}if(await save("contrats",draft,"Contrat enregistré."))go("contrats");break;
+    case"delContrat":await confirmDel("contrats","supprimer ce contrat");break;
+    case"passage":{const k=S.contrats.find(x=>x.id===b.dataset.id);if(!k)break;
+      const ch={id:uid(),clientId:k.clientId,titre:k.titre,type:k.type,adresse:"",date:k.prochain||today(),statut:"prévu",kit:[...((S.cfg.kits||{})[k.type]||[])],checklist:stepsFor(k.type).map(t=>({t,done:false})),heures:[],frais:[],lignes:fraisDefaut(),note:k.note||"",m3:"",contratId:k.id,created:today()};
+      if(await save("chantiers",ch)){const{id,...kk}=k;await save("contrats",{...kk,id,prochain:nextPassage(k,k.prochain||today())},"Passage du "+fdate(ch.date)+" planifié.");go("chantiers",ch.id)}break}
+    case"addOuv":draft.ouvriers=draft.ouvriers||[];draft.ouvriers.push({id:uid(),nom:"",taux:0});rerender();break;
+    case"addCat":draft.catalogue.push({n:"Nouvelle prestation",u:"forfait",p:0});rerender();break;
+    case"saveCfg":try{const{...c}=draft;const first=route.sub==="setup";if(!(c.entreprise||"").trim()){toast("Indiquez le nom de votre entreprise.");break}
+      c.taux=num(c.taux);c.kmCost=num(c.kmCost);c.payeJour=num(c.payeJour);c.margeAchats=num(c.margeAchats);c.setup=true;c.role="patron";
+      c.fraisStd=(c.fraisStd||[]).filter(f=>(f.n||"").trim());c.jobs=(c.jobs||JOBS_DEF).filter(j=>(j.n||"").trim());c.machinesL=(c.machinesL||MACHINES_DEF).filter(x=>(x.c||"").trim());c.decharges=(c.decharges||[]).filter(x=>(x.n||"").trim());c.catalogue=(c.catalogue||[]).filter(x=>(x.n||"").trim());c.ouvriers=(c.ouvriers||[]).filter(x=>(x.nom||"").trim());
+      if(!c.tvas||!c.tvas.length)c.tvas=(PAYS[c.pays]||PAYS.BE).tvas;
+      const ex=first&&document.getElementById("s_demo")?.checked;
+      await store.saveCfg(c);if(ex)await addDemo(true);toast(first?"Votre app est prête.":"Réglages enregistrés.");go("accueil")}catch(err){console.error(err);toast("Enregistrement refusé ("+(err&&(err.code||err.message)||"erreur")+").")}break;
+  }
+});
+function copyOut(text,label){
+  const out=document.getElementById("copyOut");if(!out)return;
+  const show=()=>{out.innerHTML=`<label for="copyTa">${esc(label||"Texte à coller dans "+outil())}</label><textarea id="copyTa" class="copybox" readonly>${esc(text)}</textarea>`;const ta=document.getElementById("copyTa");ta.focus();ta.select()};
+  try{navigator.clipboard.writeText(text).then(()=>{toast(label?"Message copié.":"Copié.");show()},()=>{show();toast("Sélectionné : copiez-le à la main.")})}catch(e){show()}
+}
+
+function csv(rows){return"\ufeff"+rows.map(r=>r.map(v=>{const s=typeof v==="number"?String(v).replace(".",","):String(v??"");return/[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}).join(";")).join("\r\n")}
+async function exportCsv(kind){
+  let rows=[];
+  if(kind==="devis"){rows=[["Numéro","Date","Client","Objet","Statut","HTVA","TVA %","TVA","TVAC"]];S.devis.forEach(d=>{const t=devisTotals(d);rows.push([d.numero,d.date,cname(d.clientId),d.objet||"",d.statut,+t.ht.toFixed(2),num(d.tva),+t.tva.toFixed(2),+t.ttc.toFixed(2)])})}
+  if(kind==="decomptes"){rows=[["Mois","Donneur d'ordre","Date","Hommes","Heures","Heures-homme","Montant HTVA","Note"]];S.decomptes.forEach(dc=>(dc.jours||[]).forEach(j=>rows.push([dc.mois,cname(dc.clientId),j.d,num(j.hommes),num(j.h),num(j.hommes)*num(j.h),+(num(j.hommes)*num(j.h)*tauxFor(dc)).toFixed(2),j.note||""])))}
+  if(kind==="frais"){rows=[["Date","Chantier","Client","Catégorie","Détail","Montant TVAC","Refacturé au client","Note de frais"]];S.chantiers.forEach(c=>(c.frais||[]).forEach(f=>rows.push([f.d,c.titre,cname(c.clientId),f.cat,f.lib||"",num(f.montant),f.refact?"oui":"non",f.smart?"oui":"non"])))}
+  if(kind==="heures"){rows=[["Date","Chantier","Client","Hommes","Heures","Heures-homme"]];S.chantiers.forEach(c=>(c.heures||[]).forEach(h=>rows.push([h.d,c.titre,cname(c.clientId),num(h.hommes),num(h.h),num(h.hommes)*num(h.h)])))}
+  if(rows.length<2){toast("Rien à exporter pour l'instant.");return}
+  const filename=slug(ent())+"-"+kind+"-"+today()+".csv";
+  if(await download(filename,csv(rows),"text/csv"))toast("Fichier "+filename+" prêt.");
+}
+async function download(filename,data,type){
+  let dl=null;try{dl=window.claude?.use?await window.claude.use("downloads"):null}catch(e){}
+  if(dl){try{await dl.save({filename,data});return true}catch(e){if(e&&e.code!=="declined")toast("Téléchargement refusé ("+(e.code||"erreur")+").");return false}}
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type}));a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);return true}catch(e){toast("Téléchargement impossible sur cet appareil.");return false}
+}
+/* ---------- sauvegarde, restauration, exemples ---------- */
+async function saveBackup(){
+  const data=JSON.stringify({app:"PaysaPro",version:1,date:new Date().toISOString(),data:mem,photos:PH});
+  const fn="sauvegarde-"+slug(ent())+"-"+today()+".json";
+  if(await download(fn,data,"application/json")){mem.config={...(mem.config||S.cfg),derniereSauvegarde:today()};try{await persist("config")}catch(e){}S.cfg.derniereSauvegarde=today();toast("Sauvegarde "+fn+" prête. Gardez-la dans Fichiers ou envoyez-la-vous par e-mail.");rerender()}
+}
+async function restoreBackup(file){
+  let o;try{o=JSON.parse(await file.text())}catch(e){toast("Ce fichier n'est pas une sauvegarde.");return}
+  if(!o||o.app!=="PaysaPro"||!o.data){toast("Ce fichier n'est pas une sauvegarde de l'app.");return}
+  confirmRestore=o;rerender();
+}
+let confirmRestore=null;
+async function doRestore(){const o=confirmRestore;if(!o)return;confirmRestore=null;
+  try{if(IDB){await idbReq("kv","readwrite",s=>s.clear());await idbReq("photos","readwrite",s=>s.clear())}
+    Object.keys(mem).forEach(k=>delete mem[k]);Object.keys(PH).forEach(k=>delete PH[k]);Object.assign(mem,o.data);Object.assign(PH,o.photos||{});
+    if(IDB){for(const k of Object.keys(mem))await persist(k);for(const[k,v]of Object.entries(PH))await idbReq("photos","readwrite",s=>s.put(v,k))}else await persist("_");
+    S.cfg={...DEFAULT_CFG,...(mem.config||{})};role="patron";if(S.cfg.role==="ouvrier")setOuvrier();store.start();toast("Données restaurées.");go(role==="ouvrier"?"missions":"accueil")}
+  catch(e){console.error(e);toast("Restauration impossible ("+(e.code||e.message||"erreur")+").")}}
+async function wipeAll(){try{if(IDB){await idbReq("kv","readwrite",s=>s.clear());await idbReq("photos","readwrite",s=>s.clear())}try{localStorage.removeItem(LS)}catch(e){}}catch(e){}
+  Object.keys(mem).forEach(k=>delete mem[k]);Object.keys(PH).forEach(k=>delete PH[k]);role="patron";apercu=false;S.cfg={...DEFAULT_CFG};store.start();route={tab:"bienvenue",id:null,sub:null};draft=null;render();toast("Tout est effacé sur cet appareil.")}
+async function addDemo(silent){
+  const c1={id:uid(),nom:"Martine Exemple",type:"particulier",adresse:"Rue de la Station 12, 1000 Bruxelles",tel:"",email:"",tvaNum:"",tva:tvas()[0],note:"Client d'exemple : supprimez-le quand vous voulez."};
+  const c2={id:uid(),nom:"Résidence Les Tilleuls (exemple)",type:"entreprise",adresse:"Avenue des Tilleuls 5, 1300 Wavre",tel:"",email:"",tvaNum:"",tva:tvas()[0],note:"Client d'exemple."};
+  const k=(S.cfg.kits||{});
+  const ch1={id:uid(),clientId:c1.id,titre:"Taille des haies (exemple)",type:"Haies",adresse:c1.adresse,date:addDays(today(),2),statut:"prévu",mode:"régie",kit:k.Haies||["Taille-haie à batterie","Bâches","Râteaux"],checklist:stepsFor("Haies").map(t=>({t,done:false})),heures:[],frais:[],lignes:fraisDefaut(),note:"",m3:"3",consignes:"Sonner chez la voisine pour la clé du jardin.",created:today()};
+  const ch2={id:uid(),clientId:c2.id,titre:"Tonte et bordures (exemple)",type:"Jardin",adresse:c2.adresse,date:addDays(today(),-3),statut:"terminé",mode:"régie",kit:["Tondeuse thermique","Coupe-bordures","Souffleur"],checklist:stepsFor("Jardin").map(t=>({t,done:true})),heures:[{d:addDays(today(),-3),hommes:2,h:4}],frais:[],lignes:fraisDefaut(),travaux:"Tonte de la pelouse, coupe des bordures, soufflage des allées.",note:"",m3:"",created:today()};
+  const cat=S.cfg.catalogue||[];const d1={id:uid(),numero:nextNumero(),clientId:c1.id,chantierId:"",objet:"Élagage d'un bouleau (exemple)",date:today(),lignes:cat.slice(2,3).map(x=>({n:x.n,u:x.u,q:1,p:x.p})),tva:tvas()[0],evac:{on:false},statut:"envoyé",sentAt:today(),created:today()};
+  for(const[c,o]of[["clients",c1],["clients",c2],["chantiers",ch1],["chantiers",ch2],["devis",d1]])await save(c,o);
+  if(!silent){toast("Exemples ajoutés.");go("accueil")}
+}
+
+/* ---------- Équipe : version ouvriers (aucun prix) + rapports vers le patron ---------- */
+const EQ={missions:"missions",rapports:"rapports"};
+let role="patron",myId=null;const loaded={};
+S.missions=[];S.rapports=[];
+const TABS_O=[
+  {k:"missions",t:"Chantiers",i:'<path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M10 20v-6h4v6"/>'},
+  {k:"rapport",t:"Rapport",i:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>'},
+  {k:"mesrapports",t:"Mes rapports",i:'<path d="M4 6h16M4 12h16M4 18h10"/>'}];
+const monNom=()=>{try{return S.cfg.prenom||localStorage.getItem("paysapro-ouvrier-nom")||""}catch(e){return S.cfg.prenom||""}};
+const missionsList=()=>role==="ouvrier"&&!apercu?S.missions:S.chantiers.filter(c=>["prévu","en cours"].includes(c.statut)&&client(c.clientId)?.type!=="sous-traitance").map(c=>({id:c.id,...missionDoc(c)}));
+function missionDoc(c){return{titre:c.titre||c.type||"",type:c.type||"",client:cname(c.clientId),adresse:adrReelle(c.adresse,c.clientId),date:c.date||"",statut:c.statut||"",kit:c.kit||[],checklist:(c.checklist||[]).map(x=>x.t),consignes:c.consignes||""}}
+function syncMissions(){}
+function renderPhotos(ph){return (ph||[]).length?`<div class="photos">${ph.map(p=>{const src=phSrc(p);return`<div class="photo"><a href="${esc(src)}" target="_blank" rel="noopener"><img src="${esc(src)}" alt="Photo ${esc(p.tag||"")}" loading="lazy"></a>${p.tag?`<span class="tag">${esc(p.tag)}</span>`:""}</div>`}).join("")}</div>`:""}
+/* --- vues ouvrier --- */
+function vMissions(){
+  const l=[...missionsList()].sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  return `<h1>Bonjour${monNom()?" "+esc(monNom()):""}</h1><p class="small">Version équipe ${esc(ent())}. Vos chantiers prévus. Touchez « Faire mon rapport » à la fin de la journée.</p>
+  ${l.length?l.map(m=>`<div class="card"><div class="row"><h3>${esc(m.titre)}</h3><span class="pill">${esc(fdate(m.date))}</span></div>
+   <div class="small">${esc(m.client)}${m.type?" · "+esc(m.type):""}</div>
+   ${m.adresse?`<a class="link small" href="${esc(mapsUrl(m.adresse))}" target="_blank" rel="noopener">📍 ${esc(m.adresse)} ›</a>`:""}
+   ${m.consignes?`<p style="margin:8px 0 0"><b>Consignes :</b> ${esc(m.consignes)}</p>`:""}
+   ${(m.kit||[]).length?`<div class="small" style="margin-top:8px"><b>Matériel :</b> ${m.kit.map(esc).join(", ")}</div>`:""}
+   ${(m.checklist||[]).length?`<div class="small" style="margin-top:4px"><b>À faire :</b> ${m.checklist.map(esc).join(" · ")}</div>`:""}
+   <div class="btns"><button class="btn" type="button" data-w="rap" data-mid="${esc(m.id)}">📝 Faire mon rapport</button>${role==="ouvrier"&&!apercu?`<button class="btn alt" type="button" data-w="fini" data-mid="${esc(m.id)}">Retirer de ma liste</button>`:""}</div></div>`).join(""):`<div class="empty">Aucun chantier pour le moment. Votre patron vous envoie chaque chantier par WhatsApp : touchez le lien, ou collez le message ci-dessous.</div>`}
+  ${apercu?"":`<h2>Coller un message</h2><div class="card"><label for="pasteIn">Message reçu du patron</label><textarea id="pasteIn" placeholder="Collez ici le message WhatsApp du chantier"></textarea><div class="btns"><button class="btn" type="button" data-act="importColle">Ajouter le chantier</button></div></div>`}`;
+}
+function newRapport(mid){return{id:uid(),missionId:mid||"",lieu:"",date:today(),heures:"",hommes:"1",travail:"",fait:[],dechets:false,m3:"",voyages:"",decharge:"",materiel:"",difficultes:"",photos:[],auteurNom:monNom(),auteurId:myId||"",statut:"nouveau"}}
+function vRapport(){
+  const r=draft||(draft=newRapport(route.sub));const m=missionsList().find(x=>x.id===r.missionId);
+  return `<h1>Mon rapport</h1>
+  <label for="r_nom">Votre prénom</label><input id="r_nom" data-f="auteurNom" value="${esc(r.auteurNom)}" autocomplete="given-name">
+  <label for="r_mis">Chantier</label><select id="r_mis" data-f="missionId"><option value="">Choisir…</option>${missionsList().map(x=>`<option value="${esc(x.id)}" ${x.id===r.missionId?"selected":""}>${esc(x.titre)} · ${esc(x.client)}</option>`).join("")}<option value="autre" ${r.missionId==="autre"?"selected":""}>Autre (pas dans la liste)</option></select>
+  ${r.missionId==="autre"?`<label for="r_lieu">Où ? (client, adresse)</label><input id="r_lieu" data-f="lieu" value="${esc(r.lieu)}">`:""}
+  <div class="grid2"><div><label for="r_date">Date</label><input id="r_date" type="date" data-f="date" value="${esc(r.date)}"></div>
+  <div><label for="r_h">Heures travaillées</label><input id="r_h" inputmode="decimal" data-f="heures" value="${esc(r.heures)}" placeholder="Ex. 7,5"></div>
+  <div><label for="r_hom">Nombre de personnes (vous compris)</label><input id="r_hom" inputmode="numeric" data-f="hommes" value="${esc(r.hommes)}"></div></div>
+  <label for="r_trav">Travail fait</label><textarea id="r_trav" data-f="travail" placeholder="Ex. taille des haies côté rue, tonte, ramassage">${esc(r.travail)}</textarea>
+  ${m&&(m.checklist||[]).length?`<label>Coché aujourd'hui</label><div class="chips">${m.checklist.map(t=>{const on=r.fait.includes(t);return`<button type="button" class="chip ${on?"on":""}" aria-pressed="${on}" data-w="fait" data-t="${esc(t)}">${on?"✓ ":""}${esc(t)}</button>`}).join("")}</div>`:""}
+  <label class="opt" style="margin-top:14px"><input type="checkbox" data-f="dechets" ${r.dechets?"checked":""}> Il y a des déchets verts</label>
+  ${r.dechets?`<div class="grid2"><div><label for="r_m3">Volume (m³ environ)</label><input id="r_m3" inputmode="decimal" data-f="m3" value="${esc(r.m3)}"></div><div><label for="r_voy">Voyages à la décharge</label><input id="r_voy" inputmode="numeric" data-f="voyages" value="${esc(r.voyages)}"></div></div>
+  <label for="r_dech">Décharge</label><input id="r_dech" data-f="decharge" value="${esc(r.decharge)}" placeholder="Nom de la décharge">`:""}
+  <label for="r_mat">Achats ou matériel utilisé</label><textarea id="r_mat" data-f="materiel" placeholder="Ex. 3 sacs de terreau. Gardez le ticket pour le patron.">${esc(r.materiel)}</textarea>
+  <label for="r_diff">Problèmes ou difficultés</label><textarea id="r_diff" data-f="difficultes" placeholder="Ex. allée trop étroite pour la remorque">${esc(r.difficultes)}</textarea>
+  <p class="small" style="margin-top:12px">📷 Photos : après l'envoi, ajoutez-les dans la même conversation WhatsApp.</p>
+  <div class="btns" style="margin-top:18px"><button class="btn full" type="button" data-w="envoyer">Envoyer le rapport au patron</button></div>`;
+}
+function rapportText(r){const m=S.missions.find(x=>x.id===r.missionId);const{photos,...o}=r;
+  return[`Rapport de ${r.auteurNom} · ${fdate(r.date)}`,`Chantier : ${m?m.titre+" · "+m.client:r.lieu||"autre"}`,`Heures : ${r.heures} h × ${r.hommes} pers.`,r.travail?`Travail fait : ${r.travail}`:"",(r.fait||[]).length?`Coché : ${r.fait.join(" · ")}`:"",r.dechets?`Déchets verts : ${r.m3||"?"} m³, ${r.voyages||0} voyage(s)${r.decharge?" à "+r.decharge:""}`:"",r.materiel?`Achats / matériel : ${r.materiel}`:"",r.difficultes?`Difficultés : ${r.difficultes}`:"",`\nPour l'ajouter dans l'app : ${APP_URL}#r=${enc64({v:1,...o})}`].filter(Boolean).join("\n")}
+function vMesRapports(){
+  const l=S.rapports.sort((a,b)=>(b.envoyeLe||b.date||"").localeCompare(a.envoyeLe||a.date||""));const top=route.sub&&l.find(r=>r.id===route.sub);
+  return `<h1>Mes rapports</h1>${top?shareBox(rapportText(top),S.cfg.patronTel,"Dernière étape : envoyez le rapport à "+(S.cfg.patronNom||"votre patron")):""}${l.length?l.map(r=>{const m=S.missions.find(x=>x.id===r.missionId);return`<div class="card"><div class="row"><h3>${esc(m?m.titre+" · "+m.client:r.lieu||"Chantier")}</h3><span class="pill">${fdate(r.date)}</span></div><div class="small">${esc(r.heures)} h · ${esc(r.hommes)} pers.</div><p class="small">${esc(r.travail)}</p>${r.id!==route.sub?`<button class="chip" type="button" data-w="renvoi" data-id="${esc(r.id)}">↻ Renvoyer au patron</button>`:""}</div>`}).join(""):`<div class="empty">Aucun rapport envoyé.</div>`}`;
+}
+/* --- vue patron : rapports reçus --- */
+function vRapports(){
+  if(route.id){const r=S.rapports.find(x=>x.id===route.id);if(!r)return`<div class="empty">Rapport introuvable.</div>`;
+    const c=S.chantiers.find(x=>x.id===r.missionId);
+    return `<button class="back" type="button" data-tabgo="rapports">‹ Rapports</button><h1>Rapport de ${esc(r.auteurNom||"l'ouvrier")}</h1>
+    <div class="card"><div class="tot"><span>Chantier</span><span>${esc(c?(c.titre||c.type)+" · "+cname(c.clientId):r.lieu||"Autre")}</span><span>Date</span><span>${fdate(r.date)}</span><span>Heures</span><span>${esc(r.heures)} h × ${esc(r.hommes)} pers.</span>${r.dechets?`<span>Déchets verts</span><span>${esc(r.m3||"?")} m³ · ${esc(r.voyages||"0")} voyage(s)${r.decharge?" · "+esc(r.decharge):""}</span>`:""}</div>
+    ${r.travail?`<p><b>Travail fait :</b> ${esc(r.travail)}</p>`:""}${(r.fait||[]).length?`<p class="small">Coché : ${r.fait.map(esc).join(" · ")}</p>`:""}
+    ${r.materiel?`<p><b>Achats / matériel :</b> ${esc(r.materiel)}</p>`:""}${r.difficultes?`<p><b>Difficultés :</b> ${esc(r.difficultes)}</p>`:""}
+    ${renderPhotos(r.photos)}</div>
+    <div class="btns">${r.statut!=="ajouté"?(c?`<button class="btn" type="button" data-act="rapAjout">Ajouter au chantier</button>`:"")+`<button class="btn alt" type="button" data-act="rapLu">Marquer comme vu</button>`:`<p class="small">✅ Ajouté au chantier${r.ajouteLe?" le "+fdate(r.ajouteLe):""}.</p>`}${c?`<button class="btn alt" type="button" data-open="chantiers:${c.id}">Ouvrir le chantier</button>`:""}</div>`}
+  const l=[...S.rapports].sort((a,b)=>(a.statut==="ajouté")-(b.statut==="ajouté")||(b.date||"").localeCompare(a.date||""));
+  return `<button class="back" type="button" data-tabgo="accueil">‹ Accueil</button><h1>Rapports des ouvriers</h1>
+  <div class="card"><label for="pasteIn">Coller un rapport reçu par WhatsApp</label><textarea id="pasteIn" placeholder="Si le lien ne s'ouvre pas dans l'app, collez ici le message de l'ouvrier"></textarea><div class="btns"><button class="btn" type="button" data-act="importColle">Ajouter le rapport</button></div></div>
+  ${l.length?l.map(r=>{const c=S.chantiers.find(x=>x.id===r.missionId);return`<button class="card" type="button" data-open="rapports:${r.id}"><div class="row"><h3>${esc(r.auteurNom||"Ouvrier")} · ${fdate(r.date)}</h3><span class="pill ${r.statut==="ajouté"?"p-ok":"p-warn"}">${r.statut==="ajouté"?"ajouté":"à voir"}</span></div><div class="small">${esc(c?(c.titre||c.type)+" · "+cname(c.clientId):r.lieu||"Autre")} · ${esc(r.heures)} h × ${esc(r.hommes)}</div></button>`}).join(""):`<div class="empty">Aucun rapport reçu. Envoyez un chantier à un ouvrier depuis sa fiche (bouton « Envoyer ce chantier à un ouvrier »).</div>`}`;
+}
+async function rapportAjout(r,marquerSeul){
+  const upd={statut:"ajouté",ajouteLe:today()};
+  if(!marquerSeul){const c0=S.chantiers.find(x=>x.id===r.missionId);if(!c0){toast("Chantier introuvable.");return}
+    const c=JSON.parse(JSON.stringify(c0));c.heures=c.heures||[];c.heures.push({d:r.date,hommes:String(r.hommes||1),h:String(r.heures||0).replace(",",".")});
+    const who=r.auteurNom?" ("+r.auteurNom+")":"";
+    if(r.travail)c.travaux=(c.travaux?c.travaux.trim()+"; ":"")+r.travail.trim();
+    (c.checklist||[]).forEach(x=>{if((r.fait||[]).includes(x.t))x.done=true});
+    c.photos=[...(c.photos||[]),...(r.photos||[])];
+    if(r.dechets){if(num(r.m3))c.m3=String(num(c.m3)+num(r.m3));const v=num(r.voyages);if(v){c.lignes=c.lignes||[];const l=c.lignes.find(x=>/évacuation/i.test(x.n)&&/voyage/i.test(x.n));if(l){l.q=c.evacRap?num(l.q)+v:v}else c.lignes.push({n:"Évacuation déchets verts (voyage)",q:v,p:prixVoyage()});c.evacRap=true}}
+    const notes=[r.materiel&&"Achats/matériel"+who+" : "+r.materiel,r.difficultes&&"Difficultés"+who+" : "+r.difficultes].filter(Boolean);
+    if(notes.length)c.note=((c.note||"").trim()+"\n"+fdate(r.date)+" · "+notes.join(" · ")).trim();
+    if(c.statut==="prévu")c.statut="en cours";
+    if(!await save("chantiers",c))return}
+  const{id,...d}=r;if(await save(EQ.rapports,{id,...d,...upd},marquerSeul?"Rapport marqué vu.":"Ajouté au chantier : heures, travail, photos et déchets."))rerender();
+}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-w]");if(!b||role!=="ouvrier")return;
+  if(b.dataset.w==="retour"){apercu=false;role="patron";go("accueil");return}
+  if(b.dataset.w==="rap"){go("rapport",null,b.dataset.mid);return}
+  if(b.dataset.w==="renvoi"){go("mesrapports",null,b.dataset.id);return}
+  if(b.dataset.w==="fini"){if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Confirmer : retirer";return}await store.remove(EQ.missions,b.dataset.mid);toast("Chantier retiré de votre liste.");return}
+  if(b.dataset.w==="fait"){const t=b.dataset.t;draft.fait=draft.fait.includes(t)?draft.fait.filter(x=>x!==t):[...draft.fait,t];rerender();return}
+  if(b.dataset.w==="envoyer"){const r=draft;
+    if(!r.auteurNom.trim()){toast("Indiquez votre prénom.");return}if(!r.missionId){toast("Choisissez le chantier.");return}if(!num(r.heures)){toast("Indiquez les heures travaillées.");return}
+    if(apercu){toast("Aperçu : rien n'est envoyé.");return}
+    try{localStorage.setItem("paysapro-ouvrier-nom",r.auteurNom.trim())}catch(err){}
+    r.auteurId="";r.envoyeLe=new Date().toISOString();delete r.photos;
+    if(await save(EQ.rapports,r,"Rapport prêt : envoyez-le maintenant.")){draft=null;go("mesrapports",null,r.id)}}
+});
+main.addEventListener("input",e=>{const el=e.target;if(!draft)return;if((el.id==="r_mis"||el.dataset.f==="dechets")&&(route.tab==="rapport"))rerender()});
+
+boot();
+})();
+</script>
