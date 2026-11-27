@@ -61,6 +61,7 @@ head = """<!doctype html>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
+<script>try{var t=localStorage.getItem("cone-theme")||"light";if(t!=="auto")document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
 """
 assert src.lstrip().startswith("<title>"), src[:80]
 src = head + src.lstrip()
