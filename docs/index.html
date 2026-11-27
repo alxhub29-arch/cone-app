@@ -664,7 +664,7 @@ const FRAIS=["Carburant camionnette","Essence machines","Carburant","Décharge",
 const MOIS=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
 const DEFAULT_CFG={taux:40,kmCost:0.3924,marge:0.15,payeJour:277,tauxOuvrier:0,ouvriers:[],coutCamion:15,carbCamion:12,coutRemorque:5,essMachines:6,volRemorque:6,coutDecharge:20,depot:"Av. Guillaume Lefever 18, 1160 Auderghem",conditions:"Paiement à 15 jours net. En cas de retard, majoration de 15 % (minimum 75 €).",catalogue:[],decharges:[],kits:{}};
 
-const S={cfg:DEFAULT_CFG,clients:[],chantiers:[],devis:[],decomptes:[],contrats:[],pieces:[],notes:[],paieouv:[],plantes:[]};
+const S={cfg:DEFAULT_CFG,clients:[],chantiers:[],devis:[],decomptes:[],contrats:[],pieces:[],notes:[],paieouv:[],plantes:[],rdv:[]};
 let route={tab:"accueil",id:null,sub:null};
 let draft=null; // objet en cours d'édition (non enregistré)
 let store=null, online=false;
@@ -696,7 +696,7 @@ const cname=id=>client(id)?.nom||"Client inconnu";
 let tt;function toast(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2600)}
 
 /* ---------- stockage : base partagée de l'artefact, sinon cet appareil ---------- */
-const COLS=["clients","chantiers","devis","decomptes","contrats","pieces","notes","paieouv","plantes"];
+const COLS=["clients","chantiers","devis","decomptes","contrats","pieces","notes","paieouv","plantes","rdv"];
 function localStore(){
   let mem={};try{mem=JSON.parse(localStorage.getItem("cone-app")||"{}")}catch(e){}
   const persist=()=>{try{localStorage.setItem("cone-app",JSON.stringify(mem))}catch(e){}};
@@ -901,7 +901,7 @@ function render(){
   m.dataset.form=draft?route.tab+":"+(route.id||""):"";
 }
 
-const VIEWS={get accueil(){return vAccueil},get clients(){return vClients},get chantiers(){return vChantiers},get devis(){return vDevis},get decomptes(){return vDecomptes},get reglages(){return vReglages},get contrats(){return vContrats},get missions(){return vMissions},get rapport(){return vRapport},get mesrapports(){return vMesRapports},get rapports(){return vRapports},get smart(){return vSmart},get compta(){return vCompta},get notes(){return vNotes},get paieouv(){return vPaieOuv},get plantes(){return vPlantes}};
+const VIEWS={get accueil(){return vAccueil},get clients(){return vClients},get chantiers(){return vChantiers},get devis(){return vDevis},get decomptes(){return vDecomptes},get reglages(){return vReglages},get contrats(){return vContrats},get missions(){return vMissions},get rapport(){return vRapport},get mesrapports(){return vMesRapports},get rapports(){return vRapports},get smart(){return vSmart},get compta(){return vCompta},get notes(){return vNotes},get paieouv(){return vPaieOuv},get plantes(){return vPlantes},get rdv(){return vRdv}};
 /* ---------- Accueil ---------- */
 function vAccueil(){
   const mois=month();
@@ -942,7 +942,7 @@ function vAccueil(){
     <div class="stat"><span class="small">Décomptes envoyés, reste à encaisser</span><b>${eur(sumImp)}</b><span class="small">${impayes.length} chantier(s) · TVAC${aFacturer.length?" · + "+eur(sumAF)+" de devis à facturer":""}</span></div>
     <div class="stat"><span class="small">Sous-traitance ce mois</span><b>${eur(decSum)}</b><span class="small">${gap>0?"dont "+eur(gap)+" au-dessus du tarif payé":"au tarif de "+S.cfg.taux+" €/h"}</span></div>
   </div>
-  <div class="row" style="margin-top:22px"><h2 style="margin:0">À faire</h2><span style="display:flex;gap:6px">${S.notes.length?`<button class="chip" type="button" data-tabgo="notes">Mes notes</button>`:""}<button class="chip on" type="button" data-act="newNote">📝 + Note</button></span></div><div style="margin-top:8px">${notesO.map(cardNote).join("")}${todo.join("")}${!notesO.length&&!todo.length?`<p class="small">Rien à faire. Ajoutez une note (texte, adresse, photos) pour ne rien oublier.</p>`:""}</div>
+  ${cardRdvAccueil()}<div class="row" style="margin-top:22px"><h2 style="margin:0">À faire</h2><span style="display:flex;gap:6px">${S.notes.length?`<button class="chip" type="button" data-tabgo="notes">Mes notes</button>`:""}<button class="chip on" type="button" data-act="newNote">📝 + Note</button></span></div><div style="margin-top:8px">${notesO.map(cardNote).join("")}${todo.join("")}${!notesO.length&&!todo.length?`<p class="small">Rien à faire. Ajoutez une note (texte, adresse, photos) pour ne rien oublier.</p>`:""}</div>
   <h2>Prochains chantiers</h2>
   ${soon.length?soon.map(cardChantier).join(""):`<div class="card empty">Aucun chantier prévu.<div class="btns" style="justify-content:center"><button class="btn" type="button" data-act="newChantier">Nouveau chantier</button></div></div>`}
   <h2>Devis en attente de réponse</h2>
@@ -1470,6 +1470,7 @@ main.addEventListener("click",async e=>{
   const confirmDel=async(col,label)=>{if(b.dataset.sure!=="1"){b.dataset.sure="1";b.textContent="Confirmer : "+label;return false}try{await store.remove(col,route.id);toast("Supprimé.");go(col);}catch(err){toast("Suppression refusée.")}return true};
   switch(a){
     case"newClient":go("clients","new");break;
+    case"rdvOk":case"rdvNo":{const r=S.rdv.find(x=>x.id===b.dataset.id);if(!r)break;await save("rdv",{...r,statut:a==="rdvOk"?"confirmé":"refusé",valideLe:new Date().toISOString()},a==="rdvOk"?"Rendez-vous confirmé. Prévenez le client sur WhatsApp.":"Rendez-vous refusé.");break}
     case"newChantier":go("chantiers","new");break;
     case"newPiece":go("compta","new");break;
     case"scrollCh":document.getElementById("chantiersClient")?.scrollIntoView({behavior:"smooth"});break;
@@ -1720,6 +1721,23 @@ function vMesRapports(){
 }
 /* ---------- Notes (liste « À faire ») ---------- */
 const photosHtml=(ph,del)=>(ph||[]).length?`<div class="photos" style="margin-top:8px">${ph.map((p,i)=>{const src=p.id?__bsrc(p.id):p.data;return`<div class="photo"><a href="${esc(src)}" target="_blank" rel="noopener"><img src="${esc(src)}" alt="Photo" loading="lazy"></a>${del?`<button class="x" type="button" data-delph="${i}" aria-label="Supprimer la photo">×</button>`:""}</div>`}).join("")}</div>`:"";
+/* ---------- Rendez-vous pris par l'agent WhatsApp ---------- */
+const rdvTxt=r=>new Date(r.date+"T12:00:00").toLocaleDateString("fr-BE",{weekday:"long",day:"numeric",month:"long"})+" à "+String(r.heure||"").replace(/^0/,"").replace(":00","h").replace(":","h");
+const rdvAVenir=()=>S.rdv.filter(r=>r.date&&r.date>=today()&&!/annul|refus/i.test(r.statut||"")).sort((a,b)=>(a.date+a.heure).localeCompare(b.date+b.heure));
+function cardRdvAccueil(){const L=rdvAVenir();if(!L.length)return"";const n=L.filter(r=>r.statut==="provisoire").length;
+  return`<button class="card" type="button" data-tabgo="rdv" style="${n?"border:2px solid var(--green);":""}margin-top:10px"><div class="row"><h3>📅 ${n?n+" rendez-vous WhatsApp à valider":L.length+" visite"+(L.length>1?"s":"")+" prévue"+(L.length>1?"s":"")}</h3><span>›</span></div><div class="small">Prochaine : ${esc(rdvTxt(L[0]))}${L[0].nom?" · "+esc(L[0].nom):""}</div></button>`}
+function cardRdv(r,actions){const tel=String(r.telephone||"").replace(/[^\d]/g,"");const prov=r.statut==="provisoire";
+  return`<div class="card" style="${prov?"border:2px solid var(--green)":""}"><div class="row"><h3 style="margin:0">${esc(rdvTxt(r))}</h3><span class="pill ${prov?"p-warn":"p-ok"}">${esc(r.statut||"")}</span></div>
+  <p style="margin:6px 0"><b>${esc(r.nom||"Client")}</b>${r.type?` · <span class="small">${esc(r.type)}</span>`:""}</p>
+  ${r.travaux?`<p class="small" style="margin:4px 0">🌿 ${esc(r.travaux)}</p>`:""}
+  ${r.adresse?`<p class="small" style="margin:4px 0">📍 <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.adresse)}" target="_blank" rel="noopener">${esc(r.adresse)}</a></p>`:""}
+  ${tel?`<p class="small" style="margin:4px 0">💬 <a href="https://wa.me/${tel}" target="_blank" rel="noopener">+${esc(tel)}</a></p>`:""}
+  ${actions&&prov?`<div class="btns"><button class="btn" type="button" data-act="rdvOk" data-id="${esc(r.id)}">✓ Confirmer</button><button class="btn alt" type="button" data-act="rdvNo" data-id="${esc(r.id)}">✗ Refuser</button></div>`:""}</div>`}
+function vRdv(){const L=rdvAVenir();const autres=S.rdv.filter(r=>!L.includes(r)).sort((a,b)=>((b.date||"")+(b.heure||"")).localeCompare((a.date||"")+(a.heure||""))).slice(0,20);
+  return`<button class="back" type="button" data-tabgo="accueil">‹ Accueil</button><h1>Rendez-vous WhatsApp</h1>
+  <p class="small">Visites pour devis prises par l'agent WhatsApp. Elles restent provisoires tant que vous ne les confirmez pas.</p>
+  ${L.length?L.map(r=>cardRdv(r,true)).join(""):`<p class="small">Aucun rendez-vous à venir.</p>`}
+  ${autres.length?`<h2>Passés, annulés ou refusés</h2>${autres.map(r=>cardRdv(r,false)).join("")}`:""}`}
 function cardNote(n){const late=n.rappel&&n.rappel<=today();const ph=(n.photos||[])[0];return`<button class="card todo" type="button" data-open="notes:${n.id}"><span class="pill ${late?"p-warn":""}">📝 Note</span><span style="flex:1;min-width:0"><b>${esc(n.titre||(n.texte||"").slice(0,60)||"Note")}</b><br><span class="small">${[n.clientId&&cname(n.clientId),n.adresse&&"📍 "+n.adresse,n.rappel&&(late?"⏰ ":"")+"pour le "+fdate(n.rappel),(n.photos||[]).length&&"📷 "+n.photos.length].filter(Boolean).map(esc).join(" · ")}</span></span>${ph?`<img src="${esc(ph.id?__bsrc(ph.id):ph.data)}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none">`:""}</button>`}
 function vNotes(){
   if(route.id)return fNote();
