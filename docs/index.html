@@ -682,7 +682,8 @@ const daysSince=d=>d?Math.floor((Date.now()-new Date(d+"T12:00:00"))/864e5):0;
 const FRAIS_STD=[[/^forfait remorque/i,"Forfait remorque",20.79],[/^frais de déplacement/i,"Frais de déplacement",39.69],[/forfait par voyage/i,"Évacuation déchets verts (voyage)",123.89]];
 const fraisDefaut=()=>FRAIS_STD.map(([re,n,p])=>{const x=(S.cfg.catalogue||[]).find(c=>re.test(c.n));return{n,q:1,p:x?x.p:p}});
 const mapsUrl=a=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a);
-function svSrc(a,w,h){const k=(S.cfg&&S.cfg.svKey||"").trim();return k&&a?`https://maps.googleapis.com/maps/api/streetview?size=${w}x${h}&scale=2&fov=75&source=outdoor&return_error_code=true&location=${encodeURIComponent(a)}&key=${encodeURIComponent(k)}`:""}
+const SV_KEY="AIzaSyCvvO5b4WFziEedRZsqvUqlSmHtZbwPW2A";/* clé limitée au site alxhub29-arch.github.io + Street View */
+function svSrc(a,w,h){const k=(S.cfg&&S.cfg.svKey||"").trim()||SV_KEY;return k&&a?`https://maps.googleapis.com/maps/api/streetview?size=${w}x${h}&scale=2&fov=75&source=outdoor&return_error_code=true&location=${encodeURIComponent(a)}&key=${encodeURIComponent(k)}`:""}
 function svPhoto(a){if(!a)return"";const src=svSrc(a,640,320);return src?`<a class="sv-photo" href="${esc(mapsUrl(a))}" target="_blank" rel="noopener"><img src="${esc(src)}" alt="La maison sur Street View" loading="lazy" onerror="this.closest('.sv-photo').classList.add('sv-none')"><span>📷 Street View</span></a>`:`<a class="btn alt" style="margin:8px 0 4px" href="${esc(mapsUrl(a))}" target="_blank" rel="noopener">📷 Voir la maison (Google Maps)</a>`}
 function svThumb(a){const src=svSrc(a,120,120);return src?`<img class="sv-thumb" src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">`:""}
 const FAUSSE_ADR=/^\s*(l'|la\s+)?(m[eê]me\s+)?(adresse(\s+(du|de\s+la|client|du\s+client))*|idem|id\.?|pareil|client|chez\s+le\s+client)\s*\.?\s*$/i;
@@ -1349,7 +1350,7 @@ function vReglages(){
   <div><label for="r_marge">Marge sur les frais (%)</label><input id="r_marge" inputmode="decimal" data-f="margePct" value="${esc(Math.round(c.marge*100))}"></div>
   <div><label for="r_paye">Tarif sous-traitance payé (€/jour)</label><input id="r_paye" inputmode="decimal" data-f="payeJour" value="${esc(c.payeJour)}"></div></div>
   <label for="r_ma">Majoration sur les achats refacturés en régie (%)</label><input id="r_ma" inputmode="decimal" data-f="margeAchats" value="${esc(c.margeAchats||0)}">
-  <label for="r_sv">Clé Google Street View (photo de la maison des clients)</label><input id="r_sv" data-f="svKey" value="${esc(c.svKey||"")}" placeholder="AIza…" autocomplete="off" spellcheck="false">
+  <label for="r_sv">Clé Google Street View (photo de la maison des clients)</label><input id="r_sv" data-f="svKey" value="${esc(c.svKey||"")}" placeholder="(clé intégrée, laisse vide)" autocomplete="off" spellcheck="false">
   <h2>Ouvriers et frais (pour calculer mon bénéfice)</h2>
   <div class="card">
   <label for="r_to">Taux payé à un ouvrier, par défaut (€/h)</label><input id="r_to" inputmode="decimal" data-f="tauxOuvrier" value="${esc(c.tauxOuvrier??0)}">
