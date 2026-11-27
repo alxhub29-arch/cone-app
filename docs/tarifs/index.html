@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CŌNES Vision">
 <meta property="og:title" content="CŌNES Vision · Photo & video rates">
-<meta property="og:description" content="Photo and video shoots, hotels and Airbnb, everywhere in Belgium. Rates 2026–2027.">
+<meta property="og:description" content="Photo and video shoots, hotels and Airbnb, everywhere in Belgium. Rates 2026–2027. Welcome offer: −15 % on your first shoot.">
 <meta property="og:url" content="https://alxhub29-arch.github.io/cone-app/tarifs/">
 <meta property="og:image" content="https://alxhub29-arch.github.io/cone-app/tarifs/apercu-partage.jpg">
 <meta property="og:image:width" content="1200">
@@ -96,6 +96,19 @@ footer b { color:var(--fg); }
 .sel { user-select:all; font-family:var(--f-mono); color:var(--fg); }
 @media (max-width:560px) { header.hero { grid-template-columns:1fr; gap:18px; padding-block:32px 20px; } .logo { width:84px; height:84px; border-radius:18px; } .lang { margin-left:0; } }
 @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto } }
+.hello { margin-top:8px; }
+.hello-in { position:relative; border-radius:18px; padding:22px; background:var(--panel); border:1px solid var(--line); overflow:hidden; }
+.hello-in::before { content:""; position:absolute; inset:0; padding:1px; border-radius:18px; background:var(--spectre); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+.hello-tag { font:500 11px/1 var(--f-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--price); }
+.hello-h { margin:10px 0 8px; font:800 clamp(24px,4vw,34px)/1.1 var(--f-disp); }
+.hello p { margin:0 0 14px; max-width:64ch; }
+.hello b { color:var(--price); }
+.coupon { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.coupon code { font:600 22px/1 var(--f-mono); letter-spacing:.12em; padding:12px 18px; border-radius:12px; border:1px dashed var(--price); color:var(--fg); }
+.copy { font:600 14px/1 var(--f-body); color:#fff; background:var(--spectre); border:0; padding:13px 18px; border-radius:999px; cursor:pointer; }
+.copy:focus-visible { outline:2px solid var(--blue-lt); outline-offset:3px; }
+.copied { color:var(--blue-lt); font-size:13px; }
+.hello-sign { margin:14px 0 0 !important; color:var(--muted); font-size:13px; }
 </style>
 </head>
 <body>
@@ -109,6 +122,12 @@ footer b { color:var(--fg); }
     <p class="lead"><span class="fr">Comme les cônes de la rétine transforment la lumière en couleurs, je transforme vos lieux, vos produits et vos moments en images qui donnent envie. Shootings photo et vidéo, hôtels et Airbnb, partout en Belgique depuis Bruxelles.</span><span class="en" lang="en">Just as the cones in the retina turn light into colour, I turn your places, products and moments into images people want to see. Photo and video shoots, hotels and Airbnb, everywhere in Belgium from Brussels.</span></p>
   </div>
 </header>
+<section class="hello" aria-label="Offre de bienvenue / Welcome offer">
+<div class="hello-in"><div class="hello-tag"><span class="en">Welcome offer</span><span class="fr">Offre de bienvenue</span></div>
+<h2 class="hello-h"><span class="en">−15 % on your first shoot 🎁</span><span class="fr">−15 % sur votre premier shooting 🎁</span></h2>
+<p><span class="en">Photo or video, hotel, Airbnb or brand: mention this code when you book and get <b>15 % off</b> your first service.</span><span class="fr">Photo ou vidéo, hôtel, Airbnb ou marque : indiquez ce code en réservant et profitez de <b>−15 %</b> sur votre première prestation.</span></p>
+<div class="coupon"><code id="code" class="sel">VISION15</code><button type="button" id="copy" class="copy"><span class="en">Copy the code</span><span class="fr">Copier le code</span></button><span id="copied" class="copied" role="status" aria-live="polite"></span></div>
+<p class="hello-sign"><span class="en">One code per client, on the first booking. Valid until 31 January 2027.</span><span class="fr">Un code par client, sur la première réservation. Valable jusqu'au 31 janvier 2027.</span></p></div></section>
 <nav class="toc" aria-label="Sections"><a href="#photo"><span class="fr">📸 Shooting photo</span><span class="en" lang="en">📸 Photo shoots</span></a><a href="#video"><span class="fr">🎬 Tournage vidéo</span><span class="en" lang="en">🎬 Video production</span></a><a href="#packs">📦 Packs</a><a href="#hebergements"><span class="fr">🏨 Hôtels, Airbnb &amp; gîtes</span><span class="en" lang="en">🏨 Hotels, Airbnb &amp; holiday homes</span></a><a href="#abonnements"><span class="fr">🗝️ Abonnements conciergeries</span><span class="en" lang="en">🗝️ Monthly plans for property managers</span></a><a href="#deplacements"><span class="fr">🚐 Déplacements</span><span class="en" lang="en">🚐 Travel</span></a><a href="#options"><span class="fr">📜 Options &amp; droits d&#x27;utilisation</span><span class="en" lang="en">📜 Options &amp; usage rights</span></a><a href="#exemples"><span class="fr">🧮 Exemples</span><span class="en" lang="en">🧮 Examples</span></a>
   <div class="lang" role="group" aria-label="Langue / Language"><button type="button" id="b-fr" data-l="fr" aria-pressed="false">FR</button><button type="button" id="b-en" data-l="en" aria-pressed="true">EN</button></div>
 </nav>
@@ -118,6 +137,18 @@ footer b { color:var(--fg); }
 <section id="paiement"><div class="exif"><span class="fr">SECTION 10 · PAIEMENT</span><span class="en" lang="en">SECTION 10 · PAYMENT</span></div><h2><span class="vf"><span class="fr">💳 Moyens de paiement</span><span class="en" lang="en">💳 Payment methods</span></span></h2><ul class="cond"><li><span aria-hidden="true">🏦</span><span><span class="fr">Virement bancaire : le numéro de compte (IBAN) figure sur le devis et la facture.</span><span class="en" lang="en">Bank transfer: the account number (IBAN) is on the quote and the invoice.</span></span></li><li><span aria-hidden="true">📱</span><span><span class="fr">Bancontact ou Payconiq : scanne le QR code envoyé avec la facture, paiement immédiat depuis ton téléphone.</span><span class="en" lang="en">Bancontact or Payconiq: scan the QR code sent with the invoice and pay instantly from your phone.</span></span></li><li><span aria-hidden="true">💳</span><span><span class="fr">Carte bancaire : lien de paiement sécurisé envoyé sur demande.</span><span class="en" lang="en">Credit or debit card: secure payment link sent on request.</span></span></li><li><span aria-hidden="true">🧾</span><span><span class="fr">Acompte de 30 % pour bloquer la date, solde à la livraison des photos ou de la vidéo. Facture avec TVA belge.</span><span class="en" lang="en">30 % deposit to book the date, balance on delivery of the photos or video. Invoice with Belgian VAT.</span></span></li></ul></section>
 <footer><span><b>CŌNES Vision</b> · <span class="fr">une activité CŌNES Colors · Auderghem, Bruxelles</span><span class="en" lang="en">a CŌNES Colors business · Auderghem, Brussels</span></span><span>📞 <span class="sel">0494 08 28 25</span> · 📸 <span class="sel">@cones.colors</span></span></footer>
 </div>
+<script>
+(function(){
+  var b=document.getElementById('copy'), c=document.getElementById('code'), o=document.getElementById('copied');
+  if(!b) return;
+  function ok(){ o.textContent = document.documentElement.lang==='en' ? 'Copied ✓' : 'Copié ✓'; setTimeout(function(){o.textContent='';},2500); }
+  function sel(){ var r=document.createRange(); r.selectNodeContents(c); var s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+  b.addEventListener('click', function(){
+    try { navigator.clipboard.writeText(c.textContent).then(ok, function(){ sel(); try{document.execCommand('copy'); ok();}catch(e){} }); }
+    catch(e){ sel(); try{document.execCommand('copy'); ok();}catch(e2){} }
+  });
+})();
+</script>
 <script>
 (function(){
   var root=document.documentElement, KEY='cones-vision-langue';
