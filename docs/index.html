@@ -12,7 +12,6 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
-<script>try{var t=localStorage.getItem("cone-theme")||"light";if(t!=="auto")document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
 <title>CŌNE</title>
 <style>
 /* App mobile d'abord : en-tête dégradé CŌNE, contenu en une colonne (max 720px), onglets en bas */
@@ -381,9 +380,7 @@ window.__coneSA={
     const compte=sync?`<h2>☁️ Mon compte</h2><div class="card"><p class="small" style="margin-top:0">Connecté : <b>${esc(sync.email()||"")}</b>. Vos données sont synchronisées entre vos appareils${sync.attente()?" ("+sync.attente()+" modification(s) en attente d'envoi)":" (tout est à jour)"}.</p><div class="btns"><button class="btn alt" type="button" data-sa="sync">🔄 Synchroniser maintenant</button><button class="btn alt" type="button" data-sa="logout">Se déconnecter</button></div></div>
     <h2>👷 Équipe</h2><div class="card" id="sa-equipe"><p class="small" style="margin:0">Chargement…</p></div>`:"";
     if(sync)setTimeout(equipe,0);
-    const th=lsGet("cone-theme")||"light";
-    const apparence=`<h2>🎨 Apparence</h2><div class="card"><div class="btns" style="margin-top:0">${[["light","☀️ Clair"],["dark","🌙 Sombre"],["auto","Comme le téléphone"]].map(([v,l])=>`<button class="btn${th===v?"":" alt"}" type="button" data-sa="theme" data-v="${v}">${l}</button>`).join("")}</div></div>`;
-    return apparence+compte+`<h2>💾 Mes données</h2><div class="card"><p class="small" style="margin-top:0">${sync?"Copie de secours (facultative) de vos clients, chantiers et photos":"Vos clients, chantiers et photos sont enregistrés sur cet appareil uniquement"} (${nbDocs()} éléments, ${blobUrl.size} photos). ${last?"Dernière sauvegarde : "+new Date(last).toLocaleDateString("fr-BE")+".":"Aucune sauvegarde pour l'instant."}</p>
+    return compte+`<h2>💾 Mes données</h2><div class="card"><p class="small" style="margin-top:0">${sync?"Copie de secours (facultative) de vos clients, chantiers et photos":"Vos clients, chantiers et photos sont enregistrés sur cet appareil uniquement"} (${nbDocs()} éléments, ${blobUrl.size} photos). ${last?"Dernière sauvegarde : "+new Date(last).toLocaleDateString("fr-BE")+".":"Aucune sauvegarde pour l'instant."}</p>
     <div class="btns"><button class="btn" type="button" data-sa="export">💾 Sauvegarder (fichier)</button><label class="btn alt filebtn">📥 Restaurer une sauvegarde<input type="file" accept="application/json,.json" data-sa-import hidden></label></div>
     <p class="small">Pour passer d'un appareil à l'autre : « Sauvegarder » ici, puis « Restaurer » sur l'autre appareil.</p></div>
     <h2>🌿 Scanner de plantes et lecture des tickets</h2><div class="card"><p class="small" style="margin-top:0">Ces fonctions utilisent l'IA Claude. Collez votre clé Claude (console.anthropic.com → API Keys). Elle reste sur cet appareil. Coût : environ 1 à 3 centimes par photo.</p>
@@ -396,7 +393,6 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-sa]"
   if(a==="export"){b.disabled=true;try{await exporter();alertMsg("Sauvegarde prête.")}catch(err){alertMsg("Sauvegarde impossible.")}b.disabled=false}
   if(a==="cle"){const v=(document.getElementById("sa_cle").value||"").trim();if(!/^sk-ant-/.test(v)){alertMsg("La clé commence par « sk-ant- ».");return}lsSet(KEY,v);location.reload()}
   if(a==="nocle"){lsSet(KEY,null);location.reload()}
-  if(a==="theme"){const v=b.dataset.v;lsSet("cone-theme",v);if(v==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",v);document.querySelectorAll('[data-sa="theme"]').forEach(x=>x.classList.toggle("alt",x.dataset.v!==v))}
   if(a==="sync"&&sync){sync.now();alertMsg("Synchronisation lancée.")}
   if(a==="logout"&&sync)sync.deconnexion(true);
   if(a==="accepter"||a==="retirer"){b.disabled=true;try{if(a==="accepter")await sync.setRole(b.dataset.uid,"ouvrier");else{if(!confirm("Retirer l'accès de "+(b.dataset.nom||"cette personne")+" ?")){b.disabled=false;return}await sync.retirer(b.dataset.uid)}equipe()}catch(err){alertMsg("Action impossible.");b.disabled=false}}
