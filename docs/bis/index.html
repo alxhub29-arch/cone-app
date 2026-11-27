@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
-<script>try{var t=localStorage.getItem("cone-theme")||"light";if(t!=="auto")document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","light")}</script>
+<script>try{var t=localStorage.getItem("cone-theme-bis")||"dark";if(t!=="auto")document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}</script>
 <title>CŌNE bis</title>
 <style>
 /* App mobile d'abord : en-tête dégradé CŌNE, contenu en une colonne (max 720px), onglets en bas */
@@ -106,7 +106,44 @@ a.link{color:var(--fg);font-weight:600}
 .kv>span:nth-child(odd){color:var(--muted);font-size:12.5px;padding-top:1px}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
-<style>.hd .logo small::after{content:" · VERSION ESSAI"}</style>
+<style>
+.hd .logo small::after{content:" · VERSION ESSAI"}
+header{color:#142000;text-shadow:none}
+.hd .gear{background:rgba(20,32,0,.14);color:#142000;font-weight:700}
+.icon{box-shadow:0 0 0 2px rgba(20,32,0,.35)}
+:root[data-theme="dark"]{
+--bg:#0c100a;--surface:#182014;--fg:#f3f7ec;--muted:#bac5ad;--line:#33402a;--chip:#263020;
+--ink:#d8ff4a;--ink-fg:#142000;--info-bg:#2a3520;--ok:#7ff09a;--warn:#ffc27a;--bad:#ffaaaa}
+:root[data-theme="dark"] body{font-size:16px}
+:root[data-theme="dark"] .small,:root[data-theme="dark"] label{font-size:13.5px}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .stat{border-radius:16px;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 6px 18px rgba(0,0,0,.25)}
+:root[data-theme="dark"] button.card:active{background:#1f2919}
+:root[data-theme="dark"] h2{color:#d8ff4a;opacity:.9}
+:root[data-theme="dark"] h1{font-size:24px}
+:root[data-theme="dark"] .stat b{color:#d8ff4a;font-size:22px}
+:root[data-theme="dark"] .tabs{background:rgba(16,22,13,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+:root[data-theme="dark"] .tab[aria-current="page"]{color:#d8ff4a} :root[data-theme="dark"] .tab[aria-current="page"] svg{stroke:#d8ff4a}
+:root[data-theme="dark"] .chip:not(.on){background:var(--chip)}
+:root[data-theme="dark"] input,:root[data-theme="dark"] select,:root[data-theme="dark"] textarea{background:#11170e;border-color:#3a4830}
+:root[data-theme="dark"] .back{color:#d8ff4a}
+
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+--bg:#0c100a;--surface:#182014;--fg:#f3f7ec;--muted:#bac5ad;--line:#33402a;--chip:#263020;
+--ink:#d8ff4a;--ink-fg:#142000;--info-bg:#2a3520;--ok:#7ff09a;--warn:#ffc27a;--bad:#ffaaaa}
+:root:not([data-theme="light"]) body{font-size:16px}
+:root:not([data-theme="light"]) .small,:root:not([data-theme="light"]) label{font-size:13.5px}
+:root:not([data-theme="light"]) .card,:root:not([data-theme="light"]) .stat{border-radius:16px;box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 6px 18px rgba(0,0,0,.25)}
+:root:not([data-theme="light"]) button.card:active{background:#1f2919}
+:root:not([data-theme="light"]) h2{color:#d8ff4a;opacity:.9}
+:root:not([data-theme="light"]) h1{font-size:24px}
+:root:not([data-theme="light"]) .stat b{color:#d8ff4a;font-size:22px}
+:root:not([data-theme="light"]) .tabs{background:rgba(16,22,13,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+:root:not([data-theme="light"]) .tab[aria-current="page"]{color:#d8ff4a} :root:not([data-theme="light"]) .tab[aria-current="page"] svg{stroke:#d8ff4a}
+:root:not([data-theme="light"]) .chip:not(.on){background:var(--chip)}
+:root:not([data-theme="light"]) input,:root:not([data-theme="light"]) select,:root:not([data-theme="light"]) textarea{background:#11170e;border-color:#3a4830}
+:root:not([data-theme="light"]) .back{color:#d8ff4a}
+}
+</style>
 </head>
 <body>
 <header><div class="hd">
@@ -382,7 +419,7 @@ window.__coneSA={
     const compte=sync?`<h2>☁️ Mon compte</h2><div class="card"><p class="small" style="margin-top:0">Connecté : <b>${esc(sync.email()||"")}</b>. Vos données sont synchronisées entre vos appareils${sync.attente()?" ("+sync.attente()+" modification(s) en attente d'envoi)":" (tout est à jour)"}.</p><div class="btns"><button class="btn alt" type="button" data-sa="sync">🔄 Synchroniser maintenant</button><button class="btn alt" type="button" data-sa="logout">Se déconnecter</button></div></div>
     <h2>👷 Équipe</h2><div class="card" id="sa-equipe"><p class="small" style="margin:0">Chargement…</p></div>`:"";
     if(sync)setTimeout(equipe,0);
-    const th=lsGet("cone-theme")||"light";
+    const th=lsGet("cone-theme-bis")||"dark";
     const apparence=`<h2>🎨 Apparence</h2><div class="card"><div class="btns" style="margin-top:0">${[["light","☀️ Clair"],["dark","🌙 Sombre"],["auto","Comme le téléphone"]].map(([v,l])=>`<button class="btn${th===v?"":" alt"}" type="button" data-sa="theme" data-v="${v}">${l}</button>`).join("")}</div></div>`;
     return apparence+compte+`<h2>💾 Mes données</h2><div class="card"><p class="small" style="margin-top:0">${sync?"Copie de secours (facultative) de vos clients, chantiers et photos":"Vos clients, chantiers et photos sont enregistrés sur cet appareil uniquement"} (${nbDocs()} éléments, ${blobUrl.size} photos). ${last?"Dernière sauvegarde : "+new Date(last).toLocaleDateString("fr-BE")+".":"Aucune sauvegarde pour l'instant."}</p>
     <div class="btns"><button class="btn" type="button" data-sa="export">💾 Sauvegarder (fichier)</button><label class="btn alt filebtn">📥 Restaurer une sauvegarde<input type="file" accept="application/json,.json" data-sa-import hidden></label></div>
@@ -397,7 +434,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-sa]"
   if(a==="export"){b.disabled=true;try{await exporter();alertMsg("Sauvegarde prête.")}catch(err){alertMsg("Sauvegarde impossible.")}b.disabled=false}
   if(a==="cle"){const v=(document.getElementById("sa_cle").value||"").trim();if(!/^sk-ant-/.test(v)){alertMsg("La clé commence par « sk-ant- ».");return}lsSet(KEY,v);location.reload()}
   if(a==="nocle"){lsSet(KEY,null);location.reload()}
-  if(a==="theme"){const v=b.dataset.v;lsSet("cone-theme",v);if(v==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",v);document.querySelectorAll('[data-sa="theme"]').forEach(x=>x.classList.toggle("alt",x.dataset.v!==v))}
+  if(a==="theme"){const v=b.dataset.v;lsSet("cone-theme-bis",v);if(v==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",v);document.querySelectorAll('[data-sa="theme"]').forEach(x=>x.classList.toggle("alt",x.dataset.v!==v))}
   if(a==="sync"&&sync){sync.now();alertMsg("Synchronisation lancée.")}
   if(a==="logout"&&sync)sync.deconnexion(true);
   if(a==="accepter"||a==="retirer"){b.disabled=true;try{if(a==="accepter")await sync.setRole(b.dataset.uid,"ouvrier");else{if(!confirm("Retirer l'accès de "+(b.dataset.nom||"cette personne")+" ?")){b.disabled=false;return}await sync.retirer(b.dataset.uid)}equipe()}catch(err){alertMsg("Action impossible.");b.disabled=false}}
