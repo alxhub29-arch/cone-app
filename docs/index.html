@@ -306,6 +306,15 @@ header{color:#142000;text-shadow:none}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
+<style id="cn-sv">
+.sv-photo{display:block;position:relative;margin:10px 0 6px;border-radius:24px;overflow:hidden;aspect-ratio:2/1;background:var(--chip);border:1px solid var(--line);box-shadow:0 14px 36px rgba(0,0,0,.35);animation:cn-up .5s cubic-bezier(.2,.8,.2,1) both}
+.sv-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.sv-photo span{position:absolute;left:10px;bottom:10px;font:600 12px var(--font);color:#fff;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:5px 10px;border-radius:99px}
+.sv-photo.sv-none{display:none}
+.sv-card{display:flex!important;gap:12px;align-items:center}
+.sv-body{flex:1;min-width:0}
+.sv-thumb{flex:none;width:56px;height:56px;border-radius:16px;object-fit:cover;background:var(--chip);border:1px solid var(--line)}
+</style>
 </head>
 <body>
 <header><div class="hd">
@@ -673,6 +682,9 @@ const daysSince=d=>d?Math.floor((Date.now()-new Date(d+"T12:00:00"))/864e5):0;
 const FRAIS_STD=[[/^forfait remorque/i,"Forfait remorque",20.79],[/^frais de déplacement/i,"Frais de déplacement",39.69],[/forfait par voyage/i,"Évacuation déchets verts (voyage)",123.89]];
 const fraisDefaut=()=>FRAIS_STD.map(([re,n,p])=>{const x=(S.cfg.catalogue||[]).find(c=>re.test(c.n));return{n,q:1,p:x?x.p:p}});
 const mapsUrl=a=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(a);
+function svSrc(a,w,h){const k=(S.cfg&&S.cfg.svKey||"").trim();return k&&a?`https://maps.googleapis.com/maps/api/streetview?size=${w}x${h}&scale=2&fov=75&source=outdoor&return_error_code=true&location=${encodeURIComponent(a)}&key=${encodeURIComponent(k)}`:""}
+function svPhoto(a){if(!a)return"";const src=svSrc(a,640,320);return src?`<a class="sv-photo" href="${esc(mapsUrl(a))}" target="_blank" rel="noopener"><img src="${esc(src)}" alt="La maison sur Street View" loading="lazy" onerror="this.closest('.sv-photo').classList.add('sv-none')"><span>📷 Street View</span></a>`:`<a class="btn alt" style="margin:8px 0 4px" href="${esc(mapsUrl(a))}" target="_blank" rel="noopener">📷 Voir la maison (Google Maps)</a>`}
+function svThumb(a){const src=svSrc(a,120,120);return src?`<img class="sv-thumb" src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">`:""}
 const FAUSSE_ADR=/^\s*(l'|la\s+)?(m[eê]me\s+)?(adresse(\s+(du|de\s+la|client|du\s+client))*|idem|id\.?|pareil|client|chez\s+le\s+client)\s*\.?\s*$/i;
 const adrReelle=(a,cid)=>{a=(a||"").trim();return a&&!FAUSSE_ADR.test(a)?a:(client(cid)?.adresse||"").trim()};
 const upMap=el=>{const m=document.getElementById("m_"+el.id);if(!m)return;const v=el.id==="h_adr"&&draft?adrReelle(el.value,draft.clientId):el.value.trim();m.href=mapsUrl(v);m.style.display=v?"inline-block":"none"};
@@ -961,13 +973,13 @@ function vClients(){
   const list=S.clients.filter(c=>!q||(c.nom+" "+(c.adresse||"")).toLowerCase().includes(q)).sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
   return `<div class="row"><h1>Clients</h1><button class="btn" type="button" data-act="newClient">+ Client</button></div>
   <label for="qClient">Rechercher</label><input id="qClient" type="search" value="${esc(route.sub||"")}" placeholder="Nom ou commune">
-  <div style="margin-top:12px">${list.length?list.map(c=>`<button class="card" type="button" data-open="clients:${c.id}"><div class="row"><h3>${esc(c.nom)}</h3><span class="pill">${esc(TYPES[c.type]||c.type)}</span></div><div class="small">${c.adresse?"📍 "+esc(c.adresse):""}</div></button>`).join(""):`<div class="empty">Aucun client${q?" trouvé":""}.</div>`}</div>`;
+  <div style="margin-top:12px">${list.length?list.map(c=>`<button class="card sv-card" type="button" data-open="clients:${c.id}">${svThumb(c.adresse)}<div class="sv-body"><div class="row"><h3>${esc(c.nom)}</h3><span class="pill">${esc(TYPES[c.type]||c.type)}</span></div><div class="small">${c.adresse?"📍 "+esc(c.adresse):""}</div></div></button>`).join(""):`<div class="empty">Aucun client${q?" trouvé":""}.</div>`}</div>`;
 }
 function fClient(){
   const c=draft||(draft=route.id==="new"?{id:uid(),nom:"",type:"particulier",adresse:"",tel:"",email:"",tvaNum:"",tva:21,note:""}:{...client(route.id)});
   if(!c||!c.id)return`<div class="empty">Client introuvable.</div>`;
   const hist=S.devis.filter(d=>d.clientId===c.id).length,ch=S.chantiers.filter(x=>x.clientId===c.id).length;
-  return `<button class="back" type="button" data-tabgo="clients">‹ Clients</button><h1>${route.id==="new"?"Nouveau client":esc(c.nom)}</h1>
+  return `<button class="back" type="button" data-tabgo="clients">‹ Clients</button><h1>${route.id==="new"?"Nouveau client":esc(c.nom)}</h1>${route.id!=="new"?svPhoto(c.adresse):""}
   ${route.id!=="new"?(()=>{const L=S.chantiers.filter(x=>x.clientId===c.id);const fact=L.reduce((s,x)=>s+(isRegie(x)?(["décompte envoyé","payé"].includes(x.statut)?regieTotals(x).ht:0):devisHT(x)),0)+S.decomptes.filter(d=>d.clientId===c.id).reduce((s,d)=>s+decTotals(d).montant,0);const nr=L.filter(x=>!sansPaie(x)&&(x.statut==="décompte envoyé"||encaisse(x).partiel)).reduce((s,x)=>s+encaisse(x).reste,0);const pb=L.reduce((s,x)=>s+sumM(x.pourboires),0);
     return`<p class="small">${ch} chantier(s) · ${hist} devis${fact?" · facturé "+eur(fact)+" HTVA":""}${nr?` · <b style="color:var(--warn)">${eur(nr)} à encaisser</b>`:""}${pb?` · 🙏 ${eur(pb)} de pourboires`:""}</p><div class="btns" style="margin-top:6px"><button class="btn alt" type="button" data-act="scrollCh">🏠 Voir ses ${ch} chantier(s) ↓</button><button class="btn alt" type="button" data-act="newChantierFor">+ Chantier chez ce client</button></div>`})():""}
   <label for="c_nom">Nom</label><input id="c_nom" data-f="nom" value="${esc(c.nom)}" autocomplete="off">
@@ -1337,6 +1349,7 @@ function vReglages(){
   <div><label for="r_marge">Marge sur les frais (%)</label><input id="r_marge" inputmode="decimal" data-f="margePct" value="${esc(Math.round(c.marge*100))}"></div>
   <div><label for="r_paye">Tarif sous-traitance payé (€/jour)</label><input id="r_paye" inputmode="decimal" data-f="payeJour" value="${esc(c.payeJour)}"></div></div>
   <label for="r_ma">Majoration sur les achats refacturés en régie (%)</label><input id="r_ma" inputmode="decimal" data-f="margeAchats" value="${esc(c.margeAchats||0)}">
+  <label for="r_sv">Clé Google Street View (photo de la maison des clients)</label><input id="r_sv" data-f="svKey" value="${esc(c.svKey||"")}" placeholder="AIza…" autocomplete="off" spellcheck="false">
   <h2>Ouvriers et frais (pour calculer mon bénéfice)</h2>
   <div class="card">
   <label for="r_to">Taux payé à un ouvrier, par défaut (€/h)</label><input id="r_to" inputmode="decimal" data-f="tauxOuvrier" value="${esc(c.tauxOuvrier??0)}">
