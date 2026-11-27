@@ -1,7 +1,19 @@
 # CŌNE
 
-Page de lancement de l'application de chantier de CŌNES Colors (paysagiste et homme à tout faire, Belgique).
+Application de chantier de CŌNES Colors (paysagiste et homme à tout faire, Belgique), autonome : elle s'ouvre directement sur https://alxhub29-arch.github.io/cone-app/ et s'installe en plein écran sur l'iPhone (Safari › Partager › « Sur l'écran d'accueil »).
 
-L'application elle-même et ses données (clients, chantiers, photos, devis) sont sur claude.ai. Cette page sert à l'installer sur l'écran d'accueil de l'iPhone avec le logo CŌ : ouvrir le site dans Safari, Partager, « Sur l'écran d'accueil ». Un appui sur l'icône ouvre Safari, qui va directement à l'app.
+- **Données** : gardées sur l'appareil (IndexedDB, marche sans réseau) et synchronisées entre appareils et ouvriers via Supabase quand `outils/supabase.json` est renseigné. Aucune donnée client n'est dans ce dépôt.
+- **Accès** : le premier compte créé est le patron ; les ouvriers créent leur accès et le patron les accepte (Réglages › Équipe). Les ouvriers ne voient que leurs missions, sans prix.
+- **IA** (scanner de plantes, lecture des tickets) : facultative, avec une clé Claude saisie dans Réglages, gardée sur l'appareil.
+
+## Construire
+
+`docs/index.html` est généré à partir de la source de l'app :
+
+```
+python3 outils/build.py <cone-app.html> docs
+```
+
+`outils/supabase-installation.sql` crée la base (tables, règles d'accès, stockage des photos) : à coller une fois dans Supabase › SQL Editor.
 
 Hébergement : GitHub Pages, branche `main`, dossier `/docs`.
