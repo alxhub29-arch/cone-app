@@ -1,5 +1,5 @@
 /* CŌNE : garde l'app disponible sans réseau. Réseau d'abord pour la page (mises à jour), cache sinon. */
-const C="cone-v39";
+const C="cone-v40";
 const FILES=["./","./index.html","./manifest.webmanifest","./icons/icon-180.png","./icons/icon-192.png","./icons/icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
